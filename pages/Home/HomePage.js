@@ -1,59 +1,73 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import HeaderBar from "../Home/HeaderBar";
+import { API_BASE_URL } from '../../api';
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  TextInput,
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  FlatList
 } from "react-native";
+
 
 const { width } = Dimensions.get("window");
 
 const HomePage = () => {
+  const [search, setSearch] = useState('');
+  const navigation = useNavigation();
+  const [hiddenGems, setHiddenGems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get(`${API_BASE_URL}/resto/getAll`)
+      .then(response => {
+        const processedData = response.data.map(item => ({
+          ...item,
+          image_url: item.image_url.startsWith('http')
+            ? item.image_url
+            : `${API_BASE_URL}/uploads/${item.image_url}`
+        }));
+        setHiddenGems(processedData);
+      })
+      .catch(error => {
+        console.error('Error fetching hidden gems:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  // HiddenGemsCard
+  const HiddenGemsCard = ({ imageSource, distance }) => {
+    return (
+      <View style={styles.cardContainer}>
+        {/* Gambar Utama */}
+        <View style={styles.cardImageWrapper}>
+          <Image source={imageSource} style={styles.cardImage} />
+        </View>
+
+        {/* Badge Jarak */}
+        <View style={styles.distanceBadge}>
+          <Text style={styles.distanceText}>{distance}</Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Image
-          source={require("../assets/logo_atas_ravelo.png")}
-          style={styles.logo}
-        />
-        <View style={{ flex: 1 }} />
-        <Image
-          source={require("../assets/profile.png")}
-          style={styles.profileIcon}
-        />
-        <View style={styles.notifContainer}>
-          <Image
-            source={require("../assets/ic_notif.png")}
-            style={styles.notifIcon}
-          />
-        </View>
-      </View>
-
-      {/* Search and Filter */}
-      <View style={styles.searchFilter}>
-        <View style={styles.searchBar}>
-          <Image
-            source={require("../assets/ic_search.png")}
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search Food/Restaurant"
-            placeholderTextColor="#9E9E9E"
-          />
-        </View>
-        <View style={styles.filterButton}>
-          <Image
-            source={require("../assets/ic_filter.png")}
-            style={styles.filterIcon}
-          />
-        </View>
-      </View>
+      {/* HeaderBar */}
+      <HeaderBar
+        searchValue={search}
+        onChangeSearch={setSearch}
+        onPressProfile={() => navigation.navigate('Profile')}
+        // onPressNotif={() => navigation.navigate('Notification')}
+        // onPressFilter={() => console.log('Filter tapped')}
+      />
 
       {/* Scrollable Content */}
       <ScrollView style={styles.scrollContent}>
@@ -65,11 +79,11 @@ const HomePage = () => {
           >
             {/* CATEGORY ITEM */}
             {[
-              { name: "Food", icon: require("../assets/ic_food.png") },
-              { name: "Drink", icon: require("../assets/ic_drinks.png") },
-              { name: "Dessert", icon: require("../assets/ic_desserts.png") },
-              { name: "Snack", icon: require("../assets/ic_snacks.png") },
-              { name: "Coffee", icon: require("../assets/ic_coffee.png") },
+              { name: "Food", icon: require("../../assets/ic_food.png") },
+              { name: "Drink", icon: require("../../assets/ic_drinks.png") },
+              { name: "Dessert", icon: require("../../assets/ic_desserts.png") },
+              { name: "Snack", icon: require("../../assets/ic_snacks.png") },
+              { name: "Coffee", icon: require("../../assets/ic_coffee.png") },
             ].map((item, index) => (
               <View key={index} style={styles.categoryItem}>
                 <View style={styles.categoryIconContainer}>
@@ -94,14 +108,29 @@ const HomePage = () => {
             <TouchableOpacity style={styles.viewAll}>
               <Text style={styles.viewAllText}>View All</Text>
               <Image
-                source={require("../assets/ic_right_arrow.png")}
+                source={require("../../assets/ic_right_arrow.png")}
                 style={styles.arrowIcon}
               />
             </TouchableOpacity>
           </View>
 
-          {/* TODO: Replace with FlatList for Hidden Gems */}
-          <View style={styles.placeholderBox} />
+          {loading ? (
+            <Text style={{ padding: 16 }}>Loading...</Text>
+          ) : (
+            <FlatList
+              data={hiddenGems}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={{ paddingHorizontal: 16 }}
+              renderItem={({ item }) => (
+                <HiddenGemsCard
+                  imageSource={{ uri: item.image_url }}
+                  distance={`${item.distance} km`}
+                />
+              )}
+            />
+          )}
         </View>
 
         {/* Promotion Card */}
@@ -111,7 +140,7 @@ const HomePage = () => {
               <Text style={styles.promoText}>Make the 10-minute trip</Text>
             </View>
             <Image
-              source={require("../assets/pizza.jpg")}
+              source={require("../../assets/logo_ravelo.png")}
               style={styles.promoImage}
             />
           </View>
@@ -129,7 +158,7 @@ const HomePage = () => {
             <TouchableOpacity style={styles.viewAll}>
               <Text style={styles.viewAllText}>View All</Text>
               <Image
-                source={require("../assets/ic_right_arrow.png")}
+                source={require("../../assets/ic_right_arrow.png")}
                 style={styles.arrowIcon}
               />
             </TouchableOpacity>
@@ -207,7 +236,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     color: "#000",
-    fontFamily: "PoppinsLight",
+    fontFamily: 'PoppinsLight',
     fontSize: 14,
   },
   filterButton: {
@@ -244,7 +273,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     color: "#000",
-    fontFamily: "PoppinsMedium",
+    fontFamily: 'PoppinsMedium',
   },
   viewAll: {
     flexDirection: "row",
@@ -253,7 +282,7 @@ const styles = StyleSheet.create({
   viewAllText: {
     color: "#911F1B",
     fontSize: 11,
-    fontFamily: "PoppinsRegular",
+    fontFamily: 'PoppinsRegular',
   },
   arrowIcon: {
     width: 6,
@@ -332,7 +361,7 @@ const styles = StyleSheet.create({
   categoryLabel: {
     fontSize: 12,
     color: "#000000",
-    fontFamily: "PoppinsRegular",
+    fontFamily: 'PoppinsRegular',
     marginTop: 4,
   },
   categoryUnderline: {
@@ -341,6 +370,34 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginHorizontal: 16,
   },
-
-
+  cardContainer: {
+    width: 100,
+    height: 120,
+    marginRight: 8,
+    position: "relative",
+  },
+  cardImageWrapper: {
+    flex: 1,
+    borderRadius: 18,
+    overflow: "hidden",
+  },
+  cardImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  distanceBadge: {
+    position: "absolute",
+    bottom: 9,
+    right: 0,
+    backgroundColor: "#E95322",
+    borderRadius: 8,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+  },
+  distanceText: {
+    fontSize: 10,
+    color: "#FFFFFF",
+    fontFamily: 'PoppinsMedium',
+  },
 });

@@ -13,7 +13,7 @@ const SplashScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("./assets/logo_ravelo.png")} 
+        source={require("../assets/logo_ravelo.png")} 
         style={styles.logo}
         resizeMode="contain"
       />
@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#FFFFFF",
     textAlign: "center",
-    fontFamily: "PoppinsMedium",
+    fontFamily: 'PoppinsMedium',
   },
 });

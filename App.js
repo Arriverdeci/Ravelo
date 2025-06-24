@@ -1,18 +1,21 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react'; // Tambahkan useEffect
 import * as Splash from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import SplashScreen from '../Ravelo/SplashScreen';
-import OnboardingScreen from './OnBoarding/OnBoardingScreen';
-import HomePage from "./Home/HomePage"; 
-import AddRestoran from "./Home/Restoran/Add";
+
+// Menu
+import SplashScreen from './pages/SplashScreen';
+import OnboardingScreen from './pages/OnBoarding/OnBoardingScreen';
+import MenuTab from './pages/MenuTabNavigation/MenuTab';
+import PickLocation from './pages/LocationMaps/PickLocation';
+import AddRestoran from './pages/Restoran/Add';
 
 Splash.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     PoppinsBold: require('./assets/fonts/Poppins/Poppins-Bold.ttf'),
     PoppinsMedium: require('./assets/fonts/Poppins/Poppins-Medium.ttf'),
     PoppinsRegular: require('./assets/fonts/Poppins/Poppins-Regular.ttf'),
@@ -31,22 +34,32 @@ export default function App() {
     PoppinsExtraLightItalic: require('./assets/fonts/Poppins/Poppins-ExtraLightItalic.ttf'),
   });
 
+  useEffect(() => {
+    console.log('fontsLoaded?', fontsLoaded);
+    if (fontError) {
+      console.error('Font loading error:', fontError);
+    }
+  }, [fontsLoaded, fontError]);
+
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
+    if (fontsLoaded || fontError) {
       await Splash.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
 
   return (
     <NavigationContainer onReady={onLayoutRootView}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="HomePage" component={HomePage} />
+        <Stack.Screen name="MainTabs" component={MenuTab} />
+        <Stack.Screen name="PickLocation" component={PickLocation} />
         <Stack.Screen name="AddRestoran" component={AddRestoran} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
