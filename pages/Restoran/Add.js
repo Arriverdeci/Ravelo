@@ -4,6 +4,7 @@ import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/nativ
 import MapView, { Marker } from "react-native-maps";
 import { API_BASE_URL } from '../../api'
 import * as FileSystem from 'expo-file-system';
+import HomePage from "../Home/HomePage";
 import {
   View,
   Text,
@@ -194,7 +195,6 @@ const AddRestoran = () => {
       }
       
       if (!finalImageUrl) {
-        // console.error("No URL or filename in response:", resData);
         throw new Error("Server did not return image URL or filename");
       }
 
@@ -332,6 +332,7 @@ const AddRestoran = () => {
     // console.log("Saving restaurant with data:", formData);
 
     await saveInBackground(formData, image);
+    // navigation.navigate('HomePage', {refresh: true});
     
     resetForm();
   };

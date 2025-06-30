@@ -10,6 +10,8 @@ import OnboardingScreen from './pages/OnBoarding/OnBoardingScreen';
 import MenuTab from './pages/MenuTabNavigation/MenuTab';
 import PickLocation from './pages/LocationMaps/PickLocation';
 import AddRestoran from './pages/Restoran/Add';
+import HiddenGems from './pages/Home/HiddenGems';
+import DetailHiddenGems from './pages/Home/DetailHiddenGems';
 
 Splash.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
@@ -59,6 +61,8 @@ export default function App() {
         <Stack.Screen name="MainTabs" component={MenuTab} />
         <Stack.Screen name="PickLocation" component={PickLocation} />
         <Stack.Screen name="AddRestoran" component={AddRestoran} />
+        <Stack.Screen name='HiddenGems' component={HiddenGems} />
+        <Stack.Screen name='DetailHiddenGems' component={DetailHiddenGems} />
       </Stack.Navigator>
     </NavigationContainer>
   );

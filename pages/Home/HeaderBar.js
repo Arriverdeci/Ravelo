@@ -110,18 +110,18 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     flex: 1,
-    height: 37,
     backgroundColor: '#FFF',
     borderRadius: 20,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
+    fontFamily: 'PoppinsRegular',
     marginRight: 10,
   },
   searchIcon: {
     width: 16,
     height: 16,
-    marginRight: 8,
+    marginRight: 6,
   },
   searchInput: {
     flex: 1,

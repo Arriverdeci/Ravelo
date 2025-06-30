@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import HeaderBar from "../Home/HeaderBar";
 import { API_BASE_URL } from '../../api';
+import axios from 'axios';
+import * as Location from 'expo-location';
 import {
   View,
   Text,
@@ -13,36 +15,176 @@ import {
   FlatList
 } from "react-native";
 
-
 const { width } = Dimensions.get("window");
 
 const HomePage = () => {
-  const [search, setSearch] = useState('');
   const navigation = useNavigation();
+  const [search, setSearch] = useState('');
   const [hiddenGems, setHiddenGems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
+  const [shouldRefresh, setShouldRefresh] = useState(false);
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/resto/getAll`)
-      .then(response => {
-        const processedData = response.data.map(item => ({
-          ...item,
-          image_url: item.image_url.startsWith('http')
-            ? item.image_url
-            : `${API_BASE_URL}/uploads/${item.image_url}`
-        }));
-        setHiddenGems(processedData);
-      })
-      .catch(error => {
-        console.error('Error fetching hidden gems:', error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    getCurrentLocation();
+    
   }, []);
 
-  // HiddenGemsCard
-  const HiddenGemsCard = ({ imageSource, distance }) => {
+  // Fungsi untuk mendapatkan lokasi
+  const getCurrentLocation = async () => {
+    try {
+      setLoading(true);
+      
+      // Minta permission untuk akses lokasi
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      
+      if (status !== 'granted') {
+        setLocationError('Permission untuk akses lokasi ditolak');
+        // Fallback: gunakan semua restoran
+        getAllResto();
+        return;
+      }
+
+      // Dapatkan lokasi current user
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+        timeInterval: 10000,
+        distanceInterval: 1,
+      });
+
+      const { latitude, longitude } = location.coords;
+      setUserLocation({ latitude, longitude });
+      setLocationError(null);
+      
+      // console.log('User location:', { latitude, longitude });
+      
+      getRestobyLoc(latitude, longitude);
+      
+    } catch (error) {
+      console.error('Error getting location:', error);
+      setLocationError('Gagal mendapatkan lokasi: ' + error.message);
+      // Fallback: gunakan semua restoran
+      getAllResto();
+    }
+  };
+
+  const getRestobyLoc = async (latitude, longitude) => {
+    try {
+      setLoading(true);
+      
+      const response = await axios.post(
+        `${API_BASE_URL}/resto/getByLocation`,
+        { latitude, longitude }
+      );
+      
+      // console.log('Location-based API Response:', response.data);
+      
+      let restaurantData = response.data;
+      if (!Array.isArray(restaurantData)) {
+        restaurantData = restaurantData.data || [];
+      }
+
+      const processedData = restaurantData.map((item, index) => ({
+        id: item.restoranId || item.id || `restaurant_${index}`,
+        name: item.namaRestoran,
+        address: item.alamat,
+        phone: item.nomorTelepon,
+        city: item.kota,
+        operatingHours: item.jamOperasional,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        status: item.status,
+        image_url: item.fotoRestoran
+          ? item.fotoRestoran.startsWith('http') 
+            ? item.fotoRestoran
+            : `${API_BASE_URL}${item.fotoRestoran}`
+          : null,
+        distance: calculateDistance(
+          latitude,
+          longitude,
+          item.latitude,
+          item.longitude
+        ).toFixed(1)
+      }));
+
+      setHiddenGems(processedData);
+      // console.log('Processed location-based data:', processedData);
+      
+    } catch (error) {
+      console.error('Error fetching restaurants by location:', error);
+      // Fallback ke semua restoran
+      getAllResto();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // kalo ga diijinin ambil lokasi
+  const getAllResto = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_BASE_URL}/resto/getAll`);
+      let restaurantData = [];
+      
+      if (response.data && Array.isArray(response.data)) {
+        restaurantData = response.data;
+      } 
+
+      const processedData = restaurantData.map((item, index) => ({
+        id: item.restoranId || item.id || `restaurant_${index}`,
+        name: item.namaRestoran,
+        address: item.alamat,
+        phone: item.nomorTelepon,
+        city: item.kota,
+        operatingHours: item.jamOperasional,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        status: item.status,
+        image_url: item.fotoRestoran || item.image_url
+          ? (item.fotoRestoran || item.image_url).startsWith('http') 
+            ? (item.fotoRestoran || item.image_url)
+            : `${API_BASE_URL}${item.fotoRestoran || item.image_url}`
+          : null,
+        distance: userLocation 
+          ? calculateDistance(
+              userLocation.latitude, 
+              userLocation.longitude, 
+              item.latitude || 0, 
+              item.longitude || 0
+            ).toFixed(1)
+          : (Math.random() * 10).toFixed(1)
+      }));
+
+      setHiddenGems(processedData);
+      // console.log('Processed all restaurant data:', processedData);
+      
+    } catch (error) {
+      console.error('Error fetching all restaurants:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        console.error('Error status:', error.response.status);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper function untuk nampilin jarak dalam km
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius bumi dalam km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distance = R * c;
+    return distance;
+  };
+
+  const HiddenGemsCard = ({ imageSource, distance, title }) => {
     return (
       <View style={styles.cardContainer}>
         {/* Gambar Utama */}
@@ -105,7 +247,9 @@ const HomePage = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Hidden Gems</Text>
-            <TouchableOpacity style={styles.viewAll}>
+            <TouchableOpacity 
+              style={styles.viewAll}
+              onPress={() => navigation.navigate('HiddenGems')}>
               <Text style={styles.viewAllText}>View All</Text>
               <Image
                 source={require("../../assets/ic_right_arrow.png")}
@@ -115,21 +259,40 @@ const HomePage = () => {
           </View>
 
           {loading ? (
-            <Text style={{ padding: 16 }}>Loading...</Text>
-          ) : (
+            <View style={styles.loadingContainer}>
+              <Text style={{paddingHorizontal: 16}}>
+                {userLocation ? 'Loading nearby restaurants...' : 'Getting your location...'}
+              </Text>
+            </View>
+          ) : locationError ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>📍 {locationError}</Text>
+              <TouchableOpacity style={styles.retryButton} onPress={getCurrentLocation}>
+                <Text style={styles.retryText}>Try Again</Text>
+              </TouchableOpacity>
+            </View>
+          ) : hiddenGems.length > 0 ? (
             <FlatList
               data={hiddenGems}
               horizontal
               showsHorizontalScrollIndicator={false}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item, index) => item.id ? item.id.toString() : `item_${index}`}
               contentContainerStyle={{ paddingHorizontal: 16 }}
               renderItem={({ item }) => (
                 <HiddenGemsCard
-                  imageSource={{ uri: item.image_url }}
+                  imageSource={
+                    item.image_url 
+                      ? { uri: item.image_url }
+                      : require("../../assets/logo_ravelo.png") // Gambar default
+                  }
                   distance={`${item.distance} km`}
                 />
               )}
             />
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No restaurants found</Text>
+            </View>
           )}
         </View>
 
@@ -178,79 +341,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#911F1B",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: 24,
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-  },
-  logo: {
-    width: 150,
-    height: 55,
-    resizeMode: "contain",
-  },
-  profileIcon: {
-    width: 47,
-    height: 50,
-    marginRight: 10,
-    resizeMode: "contain",
-  },
-  notifContainer: {
-    width: 48,
-    height: 42,
-    backgroundColor: "#E6020B",
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  notifIcon: {
-    width: 20,
-    height: 20,
-    tintColor: "white",
-  },
-  searchFilter: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
-    marginBottom: 10,
-    paddingHorizontal: 16,
-  },
-  searchBar: {
-    flex: 1,
-    height: 37,
-    backgroundColor: "#FFF",
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 10,
-  },
-  searchIcon: {
-    width: 16,
-    height: 16,
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    height: "100%",
-    color: "#000",
-    fontFamily: 'PoppinsLight',
-    fontSize: 14,
-  },
-  filterButton: {
-    width: 47,
-    height: 40,
-    backgroundColor: "#E6020B",
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  filterIcon: {
-    width: 20,
-    height: 20,
-    tintColor: "#fff",
   },
   scrollContent: {
     flex: 1,

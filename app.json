@@ -32,8 +32,17 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-font"
+     "plugins": [
+      [
+        "expo-font",
+        {}
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": true
+        }
+      ]
     ],
     "permissions": [
       "CAMERA",
