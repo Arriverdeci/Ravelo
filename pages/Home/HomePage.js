@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import HeaderBar from "../Home/HeaderBar";
 import { API_BASE_URL } from '../../api';
 import axios from 'axios';
@@ -24,29 +24,29 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
-  const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [kulinerList, setKulinerList] = useState([]);
+  const isFocused = useIsFocused();
+  const [promoIndex, setPromoIndex] = useState(0);
 
   useEffect(() => {
-    getCurrentLocation();
-    
-  }, []);
+    if (isFocused || userLocation) {
+      getCurrentLocation();
+      getKulinerData();
+    }
+  }, [isFocused, userLocation]);
 
-  // Fungsi untuk mendapatkan lokasi
   const getCurrentLocation = async () => {
     try {
       setLoading(true);
       
-      // Minta permission untuk akses lokasi
       let { status } = await Location.requestForegroundPermissionsAsync();
       
       if (status !== 'granted') {
         setLocationError('Permission untuk akses lokasi ditolak');
-        // Fallback: gunakan semua restoran
         getAllResto();
         return;
       }
 
-      // Dapatkan lokasi current user
       let location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
         timeInterval: 10000,
@@ -57,14 +57,11 @@ const HomePage = () => {
       setUserLocation({ latitude, longitude });
       setLocationError(null);
       
-      // console.log('User location:', { latitude, longitude });
-      
       getRestobyLoc(latitude, longitude);
       
     } catch (error) {
       console.error('Error getting location:', error);
-      setLocationError('Gagal mendapatkan lokasi: ' + error.message);
-      // Fallback: gunakan semua restoran
+      setLocationError('Failed to get location: ' + error.message);
       getAllResto();
     }
   };
@@ -77,8 +74,6 @@ const HomePage = () => {
         `${API_BASE_URL}/resto/getByLocation`,
         { latitude, longitude }
       );
-      
-      // console.log('Location-based API Response:', response.data);
       
       let restaurantData = response.data;
       if (!Array.isArray(restaurantData)) {
@@ -109,18 +104,15 @@ const HomePage = () => {
       }));
 
       setHiddenGems(processedData);
-      // console.log('Processed location-based data:', processedData);
       
     } catch (error) {
       console.error('Error fetching restaurants by location:', error);
-      // Fallback ke semua restoran
       getAllResto();
     } finally {
       setLoading(false);
     }
   };
 
-  // kalo ga diijinin ambil lokasi
   const getAllResto = async () => {
     try {
       setLoading(true);
@@ -157,7 +149,6 @@ const HomePage = () => {
       }));
 
       setHiddenGems(processedData);
-      // console.log('Processed all restaurant data:', processedData);
       
     } catch (error) {
       console.error('Error fetching all restaurants:', error);
@@ -170,9 +161,8 @@ const HomePage = () => {
     }
   };
 
-  // Helper function untuk nampilin jarak dalam km
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius bumi dalam km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
@@ -184,15 +174,31 @@ const HomePage = () => {
     return distance;
   };
 
+  const getKulinerData = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/review/getKuliner`, {
+        params: {
+          latitude: userLocation?.latitude || -6.2,
+          longitude: userLocation?.longitude || 106.8,
+        }
+      });
+      setKulinerList(response.data);
+    } catch (error) {
+      console.error("Error fetching kuliner:", error);
+    }
+  };
+
+  const filteredKulinerList = kulinerList.filter(item => {
+    const rating = item.totalRating || 0;
+    return rating >= 4;
+  });
+
   const HiddenGemsCard = ({ imageSource, distance, title }) => {
     return (
       <View style={styles.cardContainer}>
-        {/* Gambar Utama */}
         <View style={styles.cardImageWrapper}>
           <Image source={imageSource} style={styles.cardImage} />
         </View>
-
-        {/* Badge Jarak */}
         <View style={styles.distanceBadge}>
           <Text style={styles.distanceText}>{distance}</Text>
         </View>
@@ -200,142 +206,192 @@ const HomePage = () => {
     );
   };
 
+  const TasteCard = ({ image, title, rating, distance }) => {
+    return (
+      <View style={styles.tasteCardContainer}>
+        <View style={styles.tasteCardImageWrapper}>
+          <Image source={image} style={styles.tasteCardImage} />
+          <View style={styles.ratingBadge}>
+            <Text style={styles.ratingText}>{rating.toFixed(1)} ⭐</Text>
+          </View>
+          <View style={styles.distanceBadgeBottomRight}>
+            <Text style={styles.distanceText}>{distance} Km</Text>
+          </View>
+        </View>
+        <Text style={styles.tasteCardTitle} numberOfLines={1}>{title}</Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      {/* HeaderBar */}
       <HeaderBar
         searchValue={search}
         onChangeSearch={setSearch}
         onPressProfile={() => navigation.navigate('Profile')}
-        // onPressNotif={() => navigation.navigate('Notification')}
-        // onPressFilter={() => console.log('Filter tapped')}
       />
 
-      {/* Scrollable Content */}
-      <ScrollView style={styles.scrollContent}>
-        {/* Category */}
-        <View style={styles.section}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            {/* CATEGORY ITEM */}
-            {[
-              { name: "Food", icon: require("../../assets/ic_food.png") },
-              { name: "Drink", icon: require("../../assets/ic_drinks.png") },
-              { name: "Dessert", icon: require("../../assets/ic_desserts.png") },
-              { name: "Snack", icon: require("../../assets/ic_snacks.png") },
-              { name: "Coffee", icon: require("../../assets/ic_coffee.png") },
-            ].map((item, index) => (
-              <View key={index} style={styles.categoryItem}>
-                <View style={styles.categoryIconContainer}>
+      <FlatList
+        style={styles.scrollContent}
+        ListHeaderComponent={
+          <>
+            {/* Category Section */}
+            <View style={styles.section}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              >
+                {[
+                  { name: "Food", icon: require("../../assets/ic_food.png") },
+                  { name: "Drink", icon: require("../../assets/ic_drinks.png") },
+                  { name: "Dessert", icon: require("../../assets/ic_desserts.png") },
+                  { name: "Snack", icon: require("../../assets/ic_snacks.png") },
+                  { name: "Coffee", icon: require("../../assets/ic_coffee.png") },
+                ].map((item, index) => (
+                  <View key={index} style={styles.categoryItem}>
+                    <View style={styles.categoryIconContainer}>
+                      <Image
+                        source={item.icon}
+                        style={styles.categoryIcon}
+                        resizeMode="contain"
+                      />
+                    </View>
+                    <Text style={styles.categoryLabel}>{item.name}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+              <View style={styles.categoryUnderline} />
+            </View>
+
+            {/* Hidden Gems Section */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Hidden Gems</Text>
+                <TouchableOpacity 
+                  style={styles.viewAll}
+                  onPress={() => navigation.navigate('HiddenGems')}>
+                  <Text style={styles.viewAllText}>View All</Text>
                   <Image
-                    source={item.icon}
-                    style={styles.categoryIcon}
-                    resizeMode="contain"
+                    source={require("../../assets/ic_right_arrow.png")}
+                    style={styles.arrowIcon}
                   />
-                </View>
-                <Text style={styles.categoryLabel}>{item.name}</Text>
+                </TouchableOpacity>
               </View>
-            ))}
 
-          </ScrollView>
-          <View style={styles.categoryUnderline} />
-        </View>
-
-        {/* Hidden Gems */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Hidden Gems</Text>
-            <TouchableOpacity 
-              style={styles.viewAll}
-              onPress={() => navigation.navigate('HiddenGems')}>
-              <Text style={styles.viewAllText}>View All</Text>
-              <Image
-                source={require("../../assets/ic_right_arrow.png")}
-                style={styles.arrowIcon}
-              />
-            </TouchableOpacity>
-          </View>
-
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <Text style={{paddingHorizontal: 16}}>
-                {userLocation ? 'Loading nearby restaurants...' : 'Getting your location...'}
-              </Text>
-            </View>
-          ) : locationError ? (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>📍 {locationError}</Text>
-              <TouchableOpacity style={styles.retryButton} onPress={getCurrentLocation}>
-                <Text style={styles.retryText}>Try Again</Text>
-              </TouchableOpacity>
-            </View>
-          ) : hiddenGems.length > 0 ? (
-            <FlatList
-              data={hiddenGems}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item, index) => item.id ? item.id.toString() : `item_${index}`}
-              contentContainerStyle={{ paddingHorizontal: 16 }}
-              renderItem={({ item }) => (
-                <HiddenGemsCard
-                  imageSource={
-                    item.image_url 
-                      ? { uri: item.image_url }
-                      : require("../../assets/logo_ravelo.png") // Gambar default
-                  }
-                  distance={`${item.distance} km`}
+              {loading ? (
+                <View style={styles.loadingContainer}>
+                  <Text style={{paddingHorizontal: 16}}>
+                    {userLocation ? 'Loading nearby restaurants...' : 'Getting your location...'}
+                  </Text>
+                </View>
+              ) : locationError ? (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>📍 {locationError}</Text>
+                  <TouchableOpacity style={styles.retryButton} onPress={getCurrentLocation}>
+                    <Text style={styles.retryText}>Try Again</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : hiddenGems.length > 0 ? (
+                <FlatList
+                  horizontal
+                  data={hiddenGems}
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, index) => item.id ? item.id.toString() : `item_${index}`}
+                  contentContainerStyle={{ paddingHorizontal: 16 }}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => navigation.navigate('DetailHiddenGems', { restoranId: item.id })}>
+                      <HiddenGemsCard
+                        imageSource={
+                          item.image_url 
+                            ? { uri: item.image_url }
+                            : require("../../assets/logo_ravelo.png")
+                        }
+                        distance={`${item.distance} km`}
+                        title={item.name}
+                      />
+                    </TouchableOpacity>
+                  )}
                 />
+              ) : (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>No restaurants found</Text>
+                </View>
               )}
-            />
-          ) : (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No restaurants found</Text>
             </View>
-          )}
-        </View>
 
-        {/* Promotion Card */}
-        <View style={styles.section}>
-          <View style={styles.promoCard}>
-            <View style={styles.promoTextBox}>
-              <Text style={styles.promoText}>Make the 10-minute trip</Text>
-            </View>
-            <Image
-              source={require("../../assets/logo_ravelo.png")}
-              style={styles.promoImage}
-            />
-          </View>
-          <View style={styles.dotContainer}>
-            <View style={styles.dotActive} />
-            <View style={styles.dotInactive} />
-            <View style={styles.dotInactive} />
-          </View>
-        </View>
-
-        {/* For Your Taste */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>For Your Taste Buds</Text>
-            <TouchableOpacity style={styles.viewAll}>
-              <Text style={styles.viewAllText}>View All</Text>
-              <Image
-                source={require("../../assets/ic_right_arrow.png")}
-                style={styles.arrowIcon}
+            {/* Promotion */}
+            <View style={styles.section}>
+              <FlatList
+                data={[
+                  { id: '1', text: 'Make the 10-minute trip', image: require('../../assets/promotion_card1.jpeg') },
+                  { id: '2', text: 'Grab your foodie deal now!', image: require('../../assets/promotion_card2.jpeg') },
+                  { id: '3', text: 'Taste something new today!', image: require('../../assets/promotion_card3.jpeg') },
+                ]}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <View style={styles.promoCard}>
+                    <View style={styles.promoTextBox}>
+                      <Text style={styles.promoText}>{item.text}</Text>
+                    </View>
+                    <Image source={item.image} style={styles.promoImage} />
+                  </View>
+                )}
+                onScroll={e => {
+                  const index = Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get('window').width - 32));
+                  setPromoIndex(index);
+                }}
               />
-            </TouchableOpacity>
-          </View>
+              <View style={styles.dotContainer}>
+                {[0, 1, 2].map((i) => (
+                  <View
+                    key={i}
+                    style={i === promoIndex ? styles.dotActive : styles.dotInactive}
+                  />
+                ))}
+              </View>
+            </View>
 
-          {/* TODO: Replace with FlatList for "For Your Taste" */}
-          <View style={styles.placeholderBox} />
-        </View>
-      </ScrollView>
+            {/* For Your Taste Header */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>For Your Taste Buds</Text>
+                <TouchableOpacity style={styles.viewAll}>
+                  <Text style={styles.viewAllText}>View All</Text>
+                  <Image
+                    source={require("../../assets/ic_right_arrow.png")}
+                    style={styles.arrowIcon}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        }
+        data={filteredKulinerList}
+        keyExtractor={(item, index) => item.kulinerId?.toString() || `kuliner_${index}`}
+        numColumns={2}
+        columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 16 }}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => navigation.navigate('DetailHiddenGems', { restoranId: item.restoranId })}>
+            <TasteCard
+              image={
+                item.fotoMakanan
+                  ? { uri: `${API_BASE_URL}${item.fotoMakanan}` }
+                  : require("../../assets/logo_ravelo.png")
+              }
+              // title={item.namaMakanan}
+              rating={item.totalRating || 0}
+              distance={item.jarakKm?.toFixed(1) || "0.0"}
+            />
+          </TouchableOpacity>
+        )}
+      />
     </View>
   );
 };
-
-export default HomePage;
 
 const styles = StyleSheet.create({
   container: {
@@ -351,7 +407,6 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 20,
-    // paddingHorizontal: 16,
   },
   sectionHeader: {
     flexDirection: "row",
@@ -381,29 +436,33 @@ const styles = StyleSheet.create({
     tintColor: "#911F1B",
   },
   promoCard: {
-    flexDirection: "row",
-    borderRadius: 20,
-    overflow: "hidden",
-    elevation: 3,
-    height: 120,
-    backgroundColor: "#911F1B",
+    width: Dimensions.get('window').width - 32,
     marginHorizontal: 16,
+    borderRadius: 16,
+    backgroundColor: '#911F1B',
+    flexDirection: 'row',
+    overflow: 'hidden',
+    height: 120,
+    elevation: 3,
   },
   promoTextBox: {
     flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingLeft: 16,
+    paddingRight: 8,
   },
   promoText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontSize: 18,
+    fontFamily: 'PoppinsBold',
+    textAlign: 'center',
+    color: '#fff',
   },
   promoImage: {
-    flex: 1,
-    height: "100%",
-    resizeMode: "cover",
+    width: '45%',
+    height: '100%', 
+    resizeMode: 'cover',
+    alignSelf: 'flex-end', 
   },
   dotContainer: {
     flexDirection: "row",
@@ -415,19 +474,14 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 4,
     backgroundColor: "#911F1B",
-    marginHorizontal: 2,
+    marginHorizontal: 4,
   },
   dotInactive: {
     width: 20,
     height: 6,
     borderRadius: 4,
     backgroundColor: "#F3E9B5",
-    marginHorizontal: 2,
-  },
-  placeholderBox: {
-    height: 100,
-    backgroundColor: "#F3F3F3",
-    borderRadius: 8,
+    marginHorizontal: 4,
   },
   categoryItem: {
     alignItems: "center",
@@ -486,8 +540,81 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   distanceText: {
-    fontSize: 10,
+    fontSize: 12,
     color: "#FFFFFF",
     fontFamily: 'PoppinsMedium',
   },
+  tasteCardContainer: {
+    width: (width - 48) / 2, 
+  },
+  tasteCardImageWrapper: {
+    width: "100%",
+    height: 120,
+    borderRadius: 16,
+    overflow: "hidden",
+    position: "relative",
+  },
+  tasteCardImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  ratingBadge: {
+    position: "absolute",
+    top: 6,
+    left: 6,
+    backgroundColor: "#FFF",
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  ratingText: {
+    fontSize: 12,
+    color: "#000",
+    fontFamily: 'PoppinsMedium',
+  },
+  distanceBadgeBottomRight: {
+    position: "absolute",
+    bottom: 6,
+    right: 0,
+    backgroundColor: "#E95322",
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  tasteCardTitle: {
+    // marginTop: 4,
+    fontSize: 12,
+    color: "#000",
+    fontFamily: 'PoppinsMedium',
+  },
+  loadingContainer: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  errorContainer: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 8,
+  },
+  retryButton: {
+    backgroundColor: '#911F1B',
+    padding: 8,
+    borderRadius: 4,
+  },
+  retryText: {
+    color: 'white',
+  },
+  emptyContainer: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: '#666',
+  },
 });
+
+export default HomePage;
