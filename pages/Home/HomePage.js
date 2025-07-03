@@ -76,7 +76,7 @@ const HomePage = () => {
       const response = await axios.post(`${API_BASE_URL}/resto/getByLocation`, { latitude, longitude });
       const data = Array.isArray(response.data) ? response.data : response.data.data || [];
       const processed = data.map((item, index) => ({
-        id: item.restoranId || `restaurant_${index}`,
+        id: item.id || `restaurant_${index}`,
         name: item.namaRestoran,
         image_url: item.fotoRestoran?.startsWith('http') ? item.fotoRestoran : `${API_BASE_URL}${item.fotoRestoran}`,
         distance: calculateDistance(latitude, longitude, item.latitude, item.longitude).toFixed(1),
@@ -94,15 +94,31 @@ const HomePage = () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/resto/getAll`);
       const data = response.data || [];
-      const processed = data.map((item, index) => ({
-        id: item.restoranId || `restaurant_${index}`,
+      const processedData = data.map((item, index) => ({
+        id: item.id || `restaurant_${index}`,
         name: item.namaRestoran,
-        image_url: item.fotoRestoran?.startsWith('http') ? item.fotoRestoran : `${API_BASE_URL}${item.fotoRestoran}`,
-        distance: userLocation
-          ? calculateDistance(userLocation.latitude, userLocation.longitude, item.latitude, item.longitude).toFixed(1)
+        address: item.alamat,
+        phone: item.nomorTelepon,
+        city: item.kota,
+        operatingHours: item.jamOperasional,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        status: item.status,
+        image_url: item.fotoRestoran || item.image_url
+          ? (item.fotoRestoran || item.image_url).startsWith('http') 
+            ? (item.fotoRestoran || item.image_url)
+            : `${API_BASE_URL}${item.fotoRestoran || item.image_url}`
+          : null,
+        distance: userLocation 
+          ? calculateDistance(
+              userLocation.latitude, 
+              userLocation.longitude, 
+              item.latitude || 0, 
+              item.longitude || 0
+            ).toFixed(1)
           : (Math.random() * 10).toFixed(1)
       }));
-      setHiddenGems(processed);
+      setHiddenGems(processedData);
     } catch (error) {
       console.error('Error fetching all resto:', error);
     } finally {
@@ -200,15 +216,27 @@ const HomePage = () => {
                   <TouchableOpacity
                     key={index}
                     onPress={() => setSelectedCategory(item.name)}
-                    style={[
-                      styles.categoryItem,
-                      selectedCategory === item.name && { opacity: 0.5 },
-                    ]}
+                    style={styles.categoryItem}
                   >
-                    <View style={styles.categoryIconContainer}>
-                      <Image source={item.icon} style={styles.categoryIcon} resizeMode="contain" />
+                    <View style={[
+                      styles.categoryIconContainer,
+                      selectedCategory === item.name && styles.categoryIconContainerSelected,
+                    ]}>
+                      <Image
+                        source={item.icon}
+                        style={[
+                          styles.categoryIcon,
+                          selectedCategory === item.name && styles.categoryIconSelected
+                        ]}
+                        resizeMode="contain"
+                      />
                     </View>
-                    <Text style={styles.categoryLabel}>{item.name}</Text>
+                    <Text style={[
+                      styles.categoryLabel,
+                      selectedCategory === item.name && styles.categoryLabelSelected
+                    ]}>
+                      {item.name}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
@@ -260,7 +288,7 @@ const HomePage = () => {
                       keyExtractor={(item, index) => item.id ? item.id.toString() : `item_${index}`}
                       contentContainerStyle={{ paddingHorizontal: 16 }}
                       renderItem={({ item }) => (
-                        <TouchableOpacity onPress={() => navigation.navigate('DetailHiddenGems', { restoranId: item.id })}>
+                        <TouchableOpacity onPress={() => { console.log("Navigating to DetailHiddenGems with ID:", item.id); navigation.navigate('DetailHiddenGems', { restoranId: item.id })}}>
                           <HiddenGemsCard
                             imageSource={
                               item.image_url 
@@ -445,6 +473,18 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#F3E9B5",
     marginHorizontal: 4,
+  },
+  categoryIconContainerSelected: {
+    backgroundColor: "#fff", 
+    borderWidth: 2,
+    borderColor: "#911F1B",
+  },
+  categoryLabelSelected: {
+    color: "#911F1B",
+    fontFamily: 'PoppinsMedium',
+  },
+  categoryIconSelected: {
+    tintColor: "#911F1B",
   },
   categoryItem: {
     alignItems: "center",
