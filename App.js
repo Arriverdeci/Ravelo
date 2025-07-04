@@ -66,9 +66,6 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="MainTabs" component={MenuTab} />
         <Stack.Screen name="PickLocation" component={PickLocation} />
-        <Stack.Screen name="AddRestoran" component={AddRestoran} />
-        <Stack.Screen name='HiddenGems' component={HiddenGems} />
-        <Stack.Screen name='DetailHiddenGems' component={DetailHiddenGems} />
       </Stack.Navigator>
     </NavigationContainer>
   );

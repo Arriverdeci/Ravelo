@@ -332,8 +332,10 @@ const AddRestoran = () => {
     // console.log("Saving restaurant with data:", formData);
 
     await saveInBackground(formData, image);
-    // navigation.navigate('HomePage', {refresh: true});
-    
+    navigation.navigate("Home", {
+      screen: "HiddenGems"
+    });
+   
     resetForm();
   };
 
