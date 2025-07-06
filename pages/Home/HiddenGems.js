@@ -78,7 +78,7 @@ const HiddenGems = ({ navigation }) => {
   const renderCard = ({ item }) => (
     <View style={styles.card}>
       <Image
-        source={item.imageUrl ? { uri: item.imageUrl } : require('../../assets/onboarding1.png')}
+        source={item.imageUrl ? { uri: item.imageUrl } : require('../../assets/OnBoarding/onboarding1.png')}
         style={styles.image}
       />
 

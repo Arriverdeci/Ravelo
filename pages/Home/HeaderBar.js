@@ -20,7 +20,7 @@ const HeaderBar = ({
       {/* Header */}
       <View style={styles.header}>
         <Image
-          source={require('../../assets/logo_atas_ravelo.png')}
+          source={require('../../assets/OnBoarding/logo_atas_ravelo.png')}
           style={styles.logo}
           resizeMode="contain"
         />
