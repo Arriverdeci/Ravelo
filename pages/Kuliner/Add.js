@@ -186,6 +186,7 @@ const AddKuliner = () => {
     resetForm();
     navigation.navigate("Home", {
       screen: "DetailHiddenGems",
+      params: {restoranId: restoranId}
     });
 
   };

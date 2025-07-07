@@ -72,7 +72,7 @@ const DetailsTab = ({ restaurant }) => {
   );
 };
 
-const MenuTab = ({ restoranId }) => {
+const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
   const navigation = useNavigation();
   const [menu, setMenu] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -226,6 +226,9 @@ const MenuTab = ({ restoranId }) => {
   const retryFailedSave = (saveId, formData, imageArray) => {
     setSaveQueue((prev) => prev.filter((item) => item.id !== saveId));
     saveInBackground(formData, imageArray);
+    if (typeof onReviewSubmitted === 'function') {
+      onReviewSubmitted();
+    }
   };
 
   const removeImage = (index) => {
@@ -251,6 +254,10 @@ const MenuTab = ({ restoranId }) => {
     setRating(0);
     setReviewText("");
     setReviewImages([]);
+
+    if (onReviewSubmitted) {
+      onReviewSubmitted();
+    }
   };
 
   const renderSaveQueue = () => {
@@ -372,17 +379,16 @@ const MenuTab = ({ restoranId }) => {
   );
 };
 
-const RatingsTab = ({ restoranId }) => {
+const RatingsTab = ({ restoranId, refreshReviewFlag  }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const isFocused = useIsFocused();
-  const [index, setIndex] = useState(0);
 
   useEffect(() => {
     if (restoranId && isFocused) {
       fetchReviews();
     }
-  }, [restoranId, isFocused]);
+  }, [restoranId, isFocused, refreshReviewFlag]);
 
   const fetchReviews = async () => {
     try {
@@ -465,6 +471,7 @@ const DetailHiddenGems = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { restoranId } = route.params;
+  const [refreshReviewFlag, setRefreshReviewFlag] = useState(false);
 
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -478,6 +485,10 @@ const DetailHiddenGems = () => {
   useEffect(() => {
     fetchRestaurantDetail();
   }, [restoranId]);
+
+  const triggerRefreshReviews = () => {
+    setRefreshReviewFlag(prev => !prev);
+  };
 
   const fetchRestaurantDetail = async () => {
     try {
@@ -541,9 +552,9 @@ const DetailHiddenGems = () => {
               case 'details':
                 return <DetailsTab restaurant={restaurant} />;
               case 'menu':
-                return <MenuTab restoranId={restoranId}/>;
+                return <MenuTab restoranId={restoranId} onReviewSubmitted={triggerRefreshReviews}/>;
               case 'ratings':
-                return <RatingsTab restoranId={restoranId}/>;
+                return <RatingsTab restoranId={restoranId} refreshReviewFlag={refreshReviewFlag}/>;
               default:
                 return null;
             }
