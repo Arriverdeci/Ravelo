@@ -14,13 +14,13 @@ const Started = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/OnBoarding/logo_atas_ravelo.png')}
+        source={require('../../assets/logo_ravelo.png')}
         style={styles.logo}
         resizeMode="contain"
       />
 
       <View style={styles.content}>
-        <Text style={styles.title}>Stevens Flavors Around You</Text>
+        <Text style={styles.title}>Discover Flavors Around You</Text>
         <Text style={styles.subtitle}>One Star at a Star</Text>
 
         <View style={styles.buttonContainer}>
@@ -51,35 +51,36 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logo: {
-    width: width * 0.6,
-    height: 50,
+    width: width * 0.8,
+    height: 250,
     alignSelf: "center",
     position: "absolute",
-    top: 48,
+    top: 150,
   },
   content: {
     alignItems: "center",
     justifyContent: "center",
-    marginTop: height * 0.1,
+    marginTop: height * 0.15,
   },
   title: {
-    fontSize: 24,
+    fontSize: 17,
     color: "#FFFFFF",
     textAlign: "center",
-    fontFamily: "PoppinsBold",
-    marginBottom: 8,
+    fontFamily: "PoppinsMedium",
+    marginTop: 250,
+    marginBottom: 1,
     lineHeight: 32,
   },
   subtitle: {
-    fontSize: 16,
-    color: "#F3E9B5",
+    fontSize: 18,
+    color: "#FFFFFF",
     textAlign: "center",
     fontFamily: "PoppinsMedium",
-    marginBottom: 40,
+    marginTop: 4,
   },
   buttonContainer: {
     width: "100%",
-    marginTop: 40,
+    marginTop: 250,
   },
   getStartedButton: {
     backgroundColor: "#FFFFFF",

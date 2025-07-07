@@ -77,9 +77,9 @@ const Login = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.loginButton}>
+        {/* <TouchableOpacity style={styles.loginButton}>
           <Text style={styles.loginButtonText}>ERR IN</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
