@@ -54,7 +54,7 @@ const HeaderBar = ({
             onChangeText={onChangeSearch}
           />
         </View>
-        <TouchableOpacity style={styles.filterButton} onPress={onPressFilter}>
+        <TouchableOpacity style={styles.filterButton} onPress={onPressLanguage}>
           <Image
             source={require('../../assets/ic_filter.png')}
             style={styles.filterIcon}
