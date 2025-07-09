@@ -7,13 +7,14 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import i18n from '../i18n';
 
 const HeaderBar = ({
   searchValue,
   onChangeSearch,
   onPressProfile,
   onPressNotif,
-  onPressFilter,
+  onPressLanguage,
 }) => {
   return (
     <View style={styles.wrapper}>
@@ -48,7 +49,7 @@ const HeaderBar = ({
           />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search Food/Restaurant"
+            placeholder={i18n.t('searchPlaceholder')}
             placeholderTextColor="#9E9E9E"
             value={searchValue}
             onChangeText={onChangeSearch}

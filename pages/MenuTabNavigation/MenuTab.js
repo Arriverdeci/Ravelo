@@ -10,7 +10,6 @@ import Profile from '../Profile/Profile';
 import HiddenGems from '../Home/HiddenGems';
 import DetailHiddenGems from '../Home/DetailHiddenGems';
 import AddKuliner from '../Kuliner/Add';
-import DetailKuliner from '../Kuliner/DetailKuliner';
 import AddRestoran from '../Restoran/Add';
 import PickLocation from '../LocationMaps/PickLocation';
 import TasteBuds from '../Home/TasteBuds';
@@ -24,7 +23,7 @@ function HomeStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomePage" component={HomePage} />
       <Stack.Screen name="HiddenGems" component={HiddenGems} />
-      {/* <Stack.Screen name="TasteBuds" component={TasteBuds} /> */}
+      <Stack.Screen name="TasteBuds" component={TasteBuds} />
       <Stack.Screen name="DetailHiddenGems" component={DetailHiddenGems} />
     </Stack.Navigator>
   );
@@ -36,7 +35,6 @@ function CulinaryStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="CulinaryTab" component={Culinary} />
       <Stack.Screen name='AddKuliner' component={AddKuliner}/>
-      <Stack.Screen name='DetailKuliner' component={DetailKuliner}/>
       <Stack.Screen name='AddRestoran' component={AddRestoran}/>
       <Stack.Screen name='PickLocation' component={PickLocation}/>
       {/* Tambahkan screen lain untuk Culinary jika diperlukan */}

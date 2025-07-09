@@ -1,14 +1,215 @@
 import * as Localization from 'expo-localization';
-import i18n from 'i18n-js';
-import en from './locales/en';
-import id from './locales/id';
+import { I18n } from 'i18n-js';
 
-i18n.translations = {
-  en,
-  id,
+// Bahasa Indonesia
+const id = {
+  searchPlaceholder: "Cari Makanan/Restoran",
+  hiddenGems: "Rekomendasi Tersembunyi",
+  viewAll: "Lihat Semua",
+  forYou: "Untuk Selera Anda",
+  back: "← Kembali",
+  retryText: "Coba lagi",
+  emptyTextHome: "Tidak ditemukan restoran",
+  chooseLanguage: "Pilih Bahasa",
+  bahasaIndo: "Bahasa Indonesia",
+  bahasaEng: "Bahasa Inggris",
+  cancelLang: "Batal",
+  cancel: "Batal",
+
+  categoryFood: "Makanan",
+  categoryDrink: "Minuman",
+  categoryDessert: "Pemanis",
+  categorySnack: "Camilan",
+  categoryCoffee: "Kopi",
+
+  seeDetail: "Lihat Detail",
+  notFound: "Tidak menemukan restoran?",
+  addRestaurant: "+ Tambah Restoran",
+
+  details: "Detail",
+  menu: "Menu",
+  ratings: "Ulasan",
+  viewOnMaps: "Lihat di Google Maps",
+  openingHours: "Jam Operasional (WIB)",
+  telephone: "Telepon",
+
+  noReviews: "Belum ada ulasan.",
+  writeReview: "Tulis ulasanmu...",
+  uploadImage: "+ Unggah Gambar",
+  sendReview: "Kirim Ulasan",
+  uploadingReview: "Mengunggah ulasan...",
+  reviewFailed: "gagal - Ketuk untuk ulang",
+  wantAddMenu: "Ingin menambahkan menu baru?",
+
+  // add kuliner
+  addMenuTitle: "Menu Baru",
+  save: "Simpan",
+  tapToAddPhoto: "Tap untuk menambahkan foto",
+  cameraOrGallery: "Kamera atau Galeri",
+  dishName: "Nama Makanan",
+  price: "Harga",
+  description: "Deskripsi",
+  category: "Kategori",
+  category_food: "Makanan",
+  category_drink: "Minuman",
+  category_snack: "Camilan",
+  category_dessert: "Pemanis",
+  category_coffee: "Kopi",
+  error: "Kesalahan",
+  dishNameRequired: "Nama makanan wajib diisi",
+  priceRequired: "Harga wajib diisi",
+  descriptionRequired: "Deskripsi wajib diisi",
+  photoMenuRequired: "Mohon tambahkan foto makanan",
+  chooseSource: "Pilih sumber",
+  camera: "Kamera",
+  gallery: "Galeri",
+  savingMenu: "Menyimpan menu...",
+  saveFailed: "Gagal menyimpan",
+  retry: "Coba Lagi",
+  tapToRetry: "Tap untuk mengulang",
+
+  // add restoran
+  restaurantName: "Nama Restoran",
+  cityDistrict: "Kota/Kabupaten",
+  address: "Alamat",
+  openingHoursHint: "Jam Operasional (mis. 09:00 - 22:00)",
+  phoneNumber: "No. Telepon",
+  placeDetails: "Detail Lokasi",
+  provideLocation: "Berikan detail lokasi di bawah ini",
+  tapToSelectLocation: "Tap untuk pilih lokasi",
+  changeLocation: "Ubah Lokasi",
+  newRestaurant: "Restoran Baru",
+  savingRestaurant: "Menyimpan restoran...",
+  restaurantNameRequired: "Nama restoran wajib diisi",
+  cityRequired: "Kota/Kabupaten wajib diisi",
+  addressRequired: "Alamat wajib diisi",
+  locationRequired: "Silakan pilih lokasi di peta",
+  photoRestoRequired: "Mohon tambahkan foto restoran",
+
+  loadingMap: "Memuat peta...",
+  selectedLocation: "Lokasi Terpilih",
+  restaurantLocationHint: "Restoran akan ditempatkan di sini",
+  selected: "Terpilih",
+
+  // onboarding
+  onboarding1Title: "Jelajahi Kuliner Dimana Saja",
+  onboarding1Desc: "Jelajahi restoran atau makanan pinggir jalan dengan info seperti nama, menu unggulan, rating, dan ulasan melalui tampilan AR.",
+  onboarding2Title: "Temukan Makanan Terbaik",
+  onboarding2Desc: "Temukan cita rasa terbaik di sekitarmu dengan mudah. Aplikasi ini membantu menjelajah opsi kuliner dari restoran populer hingga hidden gems.",
+  onboarding3Title: "Pindai untuk Kenali Makanan",
+  onboarding3Desc: "Ravelo memakai kamera & teknologi AR untuk mengenali makanan secara instan. Arahkan kamera dan lihat nama makanan muncul.",
+  skip: "Lewati",
+  next: "Lanjut",
+  getStarted: "Mulai",
+
 };
 
-i18n.locale = Localization.locale.split('-')[0];
-i18n.fallbacks = true;
+// Bahasa Inggris
+const en = {
+  searchPlaceholder: "Search Food/Restaurant",
+  hiddenGems: "Hidden Gems",
+  viewAll: "View All",
+  forYou: "For Your Taste Buds",
+  back: "← Back",
+  retryText: "Try again",
+  emptyTextHome: "No restaurants found",
+  chooseLanguage: "Choose Language",
+  bahasaIndo: "Indonesian",
+  bahasaEng: "English",
+  cancelLang: "Cancel",
+  cancel: "Cancel",
+
+  categoryFood: "Food",
+  categoryDrink: "Drink",
+  categoryDessert: "Dessert",
+  categorySnack: "Snack",
+  categoryCoffee: "Coffee",
+
+  seeDetail: "See Detail",
+  notFound: "Can't find the restaurant?",
+  addRestaurant: "+ Add Restaurant",
+
+  details: "Details",
+  menu: "Menu",
+  ratings: "Ratings",
+  viewOnMaps: "View on Google Maps",
+  openingHours: "Opening Hours (WIB)",
+  telephone: "Telephone",
+
+  noReviews: "There are no reviews yet.",
+  writeReview: "Write your review...",
+  uploadImage: "+ Upload Image",
+  sendReview: "Send Review",
+  uploadingReview: "Uploading review...",
+  reviewFailed: "failed - Tap to retry",
+  wantAddMenu: "Wanna add new menu?",
+
+  // add kuliner
+  addMenuTitle: "New Menu",
+  save: "Save",
+  tapToAddPhoto: "Tap to add photo",
+  cameraOrGallery: "Camera or Gallery",
+  dishName: "Dish Name",
+  price: "Price",
+  description: "Description",
+  category: "Category",
+  category_food: "Food",
+  category_drink: "Drink",
+  category_snack: "Snack",
+  category_dessert: "Dessert",
+  category_coffee: "Coffee",
+  error: "Error",
+  dishNameRequired: "Dish name is required",
+  priceRequired: "Price is required",
+  descriptionRequired: "Description is required",
+  photoMenuRequired: "Please add dish photo",
+  chooseSource: "Choose source",
+  camera: "Camera",
+  gallery: "Gallery",
+  savingMenu: "Saving menu...",
+  saveFailed: "Save failed",
+  retry: "Retry",
+  tapToRetry: "Tap to retry",
+
+  // add restoran
+  restaurantName: "Restaurant Name",
+  cityDistrict: "City/District",
+  address: "Address",
+  openingHoursHint: "Opening Hours (e.g., 09:00 - 22:00)",
+  phoneNumber: "Phone Number",
+  placeDetails: "Place Details",
+  provideLocation: "Provide location details below",
+  tapToSelectLocation: "Tap to select location",
+  changeLocation: "Change Location",
+  newRestaurant: "New Restaurant",
+  savingRestaurant: "Saving restaurant...",
+  restaurantNameRequired: "Restaurant name is required",
+  cityRequired: "City is required",
+  addressRequired: "Address is required",
+  locationRequired: "Please select location on map",
+  photoRestoRequired: "Please add restaurant photo",
+
+  loadingMap: "Loading map...",
+  selectedLocation: "Selected Location",
+  restaurantLocationHint: "Restaurant will be placed here",
+  selected: "Selected",
+
+  // onboarding
+  onboarding1Title: "Explore Food Anywhere",
+  onboarding1Desc: "Explore nearby restaurants or street food with info like name, featured menu, ratings, and reviews via AR display.",
+  onboarding2Title: "Find the Best Foods",
+  onboarding2Desc: "Discover the best flavors around you easily. This app helps explore from popular restaurants to local hidden gems.",
+  onboarding3Title: "Scan to recognize Food",
+  onboarding3Desc: "Ravelo uses camera and AR to instantly recognize food types. Just point the camera and see the dish name appear.",
+  skip: "Skip",
+  next: "Next",
+  getStarted: "Get Started",
+
+};
+
+const i18n = new I18n();
+i18n.translations = { id, en };
+i18n.locale = Localization.locale || 'id';
+i18n.enableFallback = true;
 
 export default i18n;

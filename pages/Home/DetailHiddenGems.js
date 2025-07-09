@@ -23,6 +23,7 @@ import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { FontAwesome } from "@expo/vector-icons";
+import i18n from '../i18n';
 
 const initialLayout = { width: Dimensions.get('window').width };
 
@@ -54,18 +55,18 @@ const DetailsTab = ({ restaurant }) => {
         <View style={styles.addressContainer}>
           <Text style={styles.tabText}>{restaurant.address}</Text>
           <TouchableOpacity onPress={handleOpenMaps}>
-            <Text style={[styles.tabText, { color: '#911F1B', marginTop: 4 }]}>View on Google Maps</Text>
+            <Text style={[styles.tabText, { color: '#911F1B', marginTop: 4 }]}>{i18n.t('viewOnMaps')}</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.infoBlock}>
-        <Text style={[styles.tabText, styles.label]}>Opening Hours (WIB)</Text>
+        <Text style={[styles.tabText, styles.label]}>{i18n.t('openingHours')}</Text>
         <Text style={styles.tabText}>{restaurant.openingHours}</Text>
       </View>
 
       <View style={styles.infoBlock}>
-        <Text style={[styles.label]}>Telephone</Text>
+        <Text style={[styles.label]}>{i18n.t('telephone')}</Text>
         <Text style={styles.tabText}>{restaurant.phone}</Text>
       </View>
     </ScrollView>
@@ -267,14 +268,14 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
         {saveQueue.some((item) => item.status === "uploading") && (
           <View>
             <ActivityIndicator size="small" color="#911F1B" />
-            <Text>Uploading review...</Text>
+            <Text>{i18n.t("uploadingReview")}</Text>
           </View>
         )}
         {saveQueue
           .filter((item) => item.status === "error")
           .map((item) => (
             <TouchableOpacity key={item.id} onPress={() => retryFailedSave(item.id, {}, [])}>
-              <Text>❌ {item.name} failed - Tap to retry</Text>
+              <Text>❌ {item.name} {i18n.t("reviewFailed")}</Text>
             </TouchableOpacity>
           ))}
       </View>
@@ -301,7 +302,7 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
       <View style={{ flex: 1 }}>
         {/* {menu.length === 0 ? ( */}
           <View style={styles.emptyWrapper}>
-            <Text style={styles.emptyText}>Wanna add new menu?</Text>
+            <Text style={styles.emptyText}>{i18n.t('wantAddMenu')}</Text>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() =>
@@ -330,7 +331,10 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Image source={{ uri: `${API_BASE_URL}${selectedImage?.fotoMakanan}` }} style={styles.modalImage} resizeMode="cover" />
-            <Text style={styles.modalTitle}>{selectedImage?.namaMakanan}</Text>
+            <View style={styles.modalTextWrapper}>
+              <Text style={styles.foodName}>{selectedImage?.namaMakanan}</Text>
+              <Text style={styles.foodDesc}>{selectedImage?.deskripsi}</Text>
+            </View>
             {renderSaveQueue()}
             <View style={styles.starRow}>
               {[1, 2, 3, 4, 5].map((i) => (
@@ -341,7 +345,7 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
             </View>
             <TextInput
               style={styles.reviewInput}
-              placeholder="Write your review..."
+              placeholder={i18n.t("writeReview")}
               placeholderTextColor="#888"
               multiline
               value={reviewText}
@@ -349,7 +353,7 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
             />
             <View style={styles.imageUploadContainer}>
               <TouchableOpacity style={styles.uploadButton} onPress={handleImageUpload}>
-                <Text style={styles.uploadButtonText}>+ Upload Image</Text>
+                <Text style={styles.uploadButtonText}>{i18n.t("uploadImage")}</Text>
               </TouchableOpacity>
               {reviewImages.length > 0 && (
                 <View style={styles.imagePreviewContainer}>
@@ -366,10 +370,10 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity onPress={() => setSelectedImage(null)} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>Cancel</Text>
+                <Text style={styles.closeButtonText}>{i18n.t("cancel")}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.submitButton} onPress={onSubmitReview}>
-                <Text style={styles.submitButtonText}>Send Review</Text>
+                <Text style={styles.submitButtonText}>{i18n.t("sendReview")}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -413,7 +417,7 @@ const RatingsTab = ({ restoranId, refreshReviewFlag  }) => {
   }
 
   if (reviews.length === 0) {
-    return <Text style={{ textAlign: 'center', marginTop: 20, fontFamily: 'PoppinsRegular' }}>There are no reviews yet.</Text>;
+    return <Text style={{ textAlign: 'center', marginTop: 20, fontFamily: 'PoppinsRegular' }}>{i18n.t("noReviews")}</Text>;
   }
 
   return (
@@ -472,14 +476,16 @@ const DetailHiddenGems = () => {
   const route = useRoute();
   const { restoranId } = route.params;
   const [refreshReviewFlag, setRefreshReviewFlag] = useState(false);
+  const [locale, setLocale] = useState(i18n.locale);
+  const [showLangModal, setShowLangModal] = useState(false);
 
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'details', title: 'Details' },
-    { key: 'menu', title: 'Menu' },
-    { key: 'ratings', title: 'Ratings' },
+    { key: 'details', title: i18n.t('details') },
+    { key: 'menu', title: i18n.t('menu') },
+    { key: 'ratings', title: i18n.t('ratings') },
   ]);
 
   useEffect(() => {
@@ -532,6 +538,7 @@ const DetailHiddenGems = () => {
         searchValue=""
         onChangeSearch={() => {}}
         onPressProfile={() => navigation.navigate('Profile')}
+        onPressLanguage={() => setShowLangModal(true)} 
       />
 
       <View style={styles.scrollWrapper}>
@@ -584,6 +591,36 @@ const DetailHiddenGems = () => {
         />
       </View>
       
+                  {showLangModal && (
+                    <View style={styles.modalOverlay}>
+                      <View style={styles.modalBox}>
+                        <Text style={styles.modalTitle}>{i18n.t('chooseLanguage')}</Text>
+                        <TouchableOpacity
+                          style={styles.langOption}
+                          onPress={() => {
+                            i18n.locale = 'id';
+                            setLocale('id');
+                            setShowLangModal(false);
+                          }}
+                        >
+                          <Text style={styles.langText}>🇮🇩 {i18n.t('bahasaIndo')}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.langOption}
+                          onPress={() => {
+                            i18n.locale = 'en';
+                            setLocale('en');
+                            setShowLangModal(false);
+                          }}
+                        >
+                          <Text style={styles.langText}>🇺🇸 {i18n.t('bahasaEng')}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setShowLangModal(false)}>
+                          <Text style={styles.cancelText}>❌ {i18n.t('cancelLang')}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  )}
     </View>
   );
 };
@@ -746,7 +783,6 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontFamily: 'PoppinsMedium',
-    marginTop: 10,
     color: '#000',
   },
   starRow: {
@@ -844,6 +880,27 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: 'PoppinsMedium',
   },
+  modalTextWrapper: {
+    width: '90%',
+    marginTop: 10,
+    marginBottom: 4,
+    alignItems: 'center',
+  },
+
+  foodName: {
+    fontSize: 20,
+    fontFamily: 'PoppinsSemiBold',
+    color: '#000',
+    textAlign: 'center',
+  },
+
+  foodDesc: {
+    fontSize: 14,
+    fontFamily: 'PoppinsRegular',
+    color: '#555',
+    textAlign: 'center',
+    marginTop: 4,
+  },
   reviewCardContainer: {
     marginHorizontal: 16,
     marginVertical: 10,
@@ -902,5 +959,46 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 6,
     marginRight: 5,
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+  modalBox: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    width: 280,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    fontFamily: 'PoppinsMedium',
+  },
+  langOption: {
+    paddingVertical: 10,
+    width: '100%',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  langText: {
+    fontSize: 16,
+    fontFamily: 'PoppinsRegular',
+  },
+  cancelText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: 'red',
+    fontFamily: 'PoppinsRegular',
   },
 });
