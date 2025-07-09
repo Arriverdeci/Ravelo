@@ -7,10 +7,10 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
-  CheckBox,
 } from "react-native";
+import Checkbox from 'expo-checkbox';
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 const Login = ({ navigation }) => {
   const [rememberMe, setRememberMe] = useState(false);
@@ -27,8 +27,7 @@ const Login = ({ navigation }) => {
       />
 
       <View style={styles.content}>
-        <Text style={styles.versionText}>2.1.1</Text>
-        <Text style={styles.title}>Rovello</Text>
+        <Text style={styles.title}>Ravelo</Text>
         <Text style={styles.subtitle}>We're so capable we can avoid.</Text>
 
         <View style={styles.inputContainer}>
@@ -64,10 +63,10 @@ const Login = ({ navigation }) => {
 
         <View style={styles.optionsContainer}>
           <View style={styles.checkboxContainer}>
-            <CheckBox
+            <Checkbox
               value={rememberMe}
               onValueChange={setRememberMe}
-              style={styles.checkbox}
+              color={rememberMe ? '#E6020B' : undefined}
             />
             <Text style={styles.optionText}>Remember Me</Text>
           </View>
@@ -78,7 +77,7 @@ const Login = ({ navigation }) => {
         </View>
 
         <TouchableOpacity style={styles.loginButton}>
-          <Text style={styles.loginButtonText}>ERR IN</Text>
+          <Text style={styles.loginButtonText}>LOGIN</Text>
         </TouchableOpacity>
       </View>
     </View>

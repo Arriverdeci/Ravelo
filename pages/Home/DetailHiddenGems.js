@@ -284,7 +284,7 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => setSelectedImage(item)} style={styles.menuCard}>
       <Image
-        source={item.fotoMakanan ? { uri: `${API_BASE_URL}${item.fotoMakanan}` } : require("../../assets/onboarding1.png")}
+        source={item.fotoMakanan ? { uri: `${API_BASE_URL}${item.fotoMakanan}` } : require("../../assets/OnBoarding/onboarding1.png")}
         style={styles.menuImage}
       />
       <View style={styles.menuTextOverlay}>
@@ -426,7 +426,7 @@ const RatingsTab = ({ restoranId, refreshReviewFlag  }) => {
             {/* Header User Info */}
             <View style={styles.reviewUserRow}>
               <Image
-                source={require('../../assets/onboarding1.png')} // ganti pake user profile
+                source={require('../../assets/OnBoarding/onboarding1.png')} // ganti pake user profile
                 style={styles.reviewUserImage}
               />
               <View>
@@ -539,7 +539,7 @@ const DetailHiddenGems = () => {
           source={
             restaurant.imageUrl
               ? { uri: restaurant.imageUrl }
-              : require('../../assets/onboarding1.png')
+              : require('../../assets/OnBoarding/onboarding1.png')
           }
           style={styles.restaurantImage}
           resizeMode="cover"
