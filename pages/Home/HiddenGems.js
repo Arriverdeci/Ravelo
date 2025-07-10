@@ -118,7 +118,7 @@ const HiddenGems = ({ navigation }) => {
       <HeaderBar
         searchValue={search}
         onChangeSearch={handleSearch}
-        onPressProfile={() => navigation.navigate('Profile')}
+        onPressProfile={() => navigation.navigate('DetailProfile')}
         // onPressNotif={() => navigation.navigate('Notification')}
         // onPressFilter={() => console.log('Filter tapped')}
       />

@@ -6,6 +6,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 // Menu
 import SplashScreen from './pages/SplashScreen';
+import NSignUp from './pages/NSignUp';
+import NSignIn from './pages/NSignIn';
 import OnboardingScreen from './pages/OnBoarding/OnBoardingScreen';
 import MenuTab from './pages/MenuTabNavigation/MenuTab';
 import PickLocation from './pages/LocationMaps/PickLocation';
@@ -13,8 +15,14 @@ import AddRestoran from './pages/Restoran/Add';
 import HiddenGems from './pages/Home/HiddenGems';
 import DetailHiddenGems from './pages/Home/DetailHiddenGems';
 import Started from './pages/OnBoarding/Started';
+import SignUp from './pages/OnBoarding/SignUp';
 import SignIn from './pages/OnBoarding/SignIn';
-import Login from './pages/OnBoarding/Login';
+import DetailProfile from './pages/Profile/DetailProfile';
+import EditProfile from './pages/Profile/EditProfile';
+import ForgotPassword  from './pages/OnBoarding/ForgotPassword';
+import OTPVerification from './pages/OnBoarding/OTPVerification';
+import ResetPassword from './pages/OnBoarding/ResetPassword';
+import SuccessPage from './pages/OnBoarding/SuccessPage';
 
 Splash.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
@@ -62,9 +70,17 @@ export default function App() {
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Started" component={Started} />
+        <Stack.Screen name="SignUp" component={SignUp} />
+        <Stack.Screen name="NSignUp" component={NSignUp} />
         <Stack.Screen name="SignIn" component={SignIn} />
-        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword}/>
+        <Stack.Screen name="OTPVerification" component={OTPVerification} />
+        <Stack.Screen name="ResetPassword" component={ResetPassword} />
+        <Stack.Screen name="SuccessPage" component={SuccessPage} />
+        <Stack.Screen name="NSignIn" component={NSignIn} />
         <Stack.Screen name="MainTabs" component={MenuTab} />
+        <Stack.Screen name="EditProfile" component={EditProfile}/>
+        <Stack.Screen name="DetailProfile" component={DetailProfile} />
         <Stack.Screen name="PickLocation" component={PickLocation} />
       </Stack.Navigator>
     </NavigationContainer>

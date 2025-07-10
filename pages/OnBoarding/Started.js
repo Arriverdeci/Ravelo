@@ -26,14 +26,14 @@ const Started = ({ navigation }) => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
             style={styles.getStartedButton}
-            onPress={() => navigation.navigate("SignIn")}
+            onPress={() => navigation.navigate("SignUp")}
           >
             <Text style={styles.getStartedText}>GET STARTED</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.haveAccountButton}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate("SignIn")}
           >
             <Text style={styles.haveAccountText}>I'M READY HAVE AN ACCOUNT</Text>
           </TouchableOpacity>

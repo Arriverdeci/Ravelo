@@ -196,7 +196,7 @@ const HomePage = () => {
       <HeaderBar
         searchValue={search}
         onChangeSearch={setSearch}
-        onPressProfile={() => navigation.navigate('Profile')}
+        onPressProfile={() => navigation.navigate('DetailProfile')}
       />
 
       <FlatList
