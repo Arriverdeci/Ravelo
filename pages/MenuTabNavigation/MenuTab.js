@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 
 import HomePage from '../Home/HomePage';
+import Add from '../Restoran/Add';
 import Culinary from '../Culinary/Culinary';
 import Community from '../Community/Community';
 import Profile from '../Profile/Profile';
@@ -27,6 +28,8 @@ function HomeStack() {
       <Stack.Screen name="HiddenGems" component={HiddenGems} />
       {/* <Stack.Screen name="TasteBuds" component={TasteBuds} /> */}
       <Stack.Screen name="DetailHiddenGems" component={DetailHiddenGems} />
+      <Stack.Screen name="Add" component={Add} />
+      <Stack.Screen name="AddCulinary" component={AddCulinary} />
     </Stack.Navigator>
   );
 }
