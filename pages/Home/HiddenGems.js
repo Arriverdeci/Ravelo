@@ -123,7 +123,6 @@ const HiddenGems = ({ navigation }) => {
         onChangeSearch={handleSearch}
         onPressProfile={() => navigation.navigate('DetailProfile')}
         // onPressNotif={() => navigation.navigate('Notification')}
-        onPressProfile={() => navigation.navigate('Profile')}
         onPressLanguage={() => setShowLangModal(true)} 
       />
 
