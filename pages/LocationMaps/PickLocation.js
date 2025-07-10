@@ -64,13 +64,14 @@ const PickLocation = ({ route }) => {
 
     navigation.navigate("AddRestoran", {
       selectedLocation,
-      formData: route.params?.formData
+      formData: route.params?.formData,
     });
+
   };
 
   const handleCancel = () => {
     navigation.navigate("AddRestoran", {
-      formData: route.params?.formData
+      formData: route.params?.formData,
     });
   };
 

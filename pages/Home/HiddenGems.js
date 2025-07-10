@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import HeaderBar from "../Home/HeaderBar";
 import { API_BASE_URL } from '../../api';
 import axios from 'axios';
@@ -10,7 +10,6 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
-  ScrollView,
 } from 'react-native';
 
 const HiddenGems = ({ navigation }) => {
@@ -18,10 +17,13 @@ const HiddenGems = ({ navigation }) => {
   const [hiddenGems, setHiddenGems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filteredHiddenGems, setFilteredHiddenGems] = useState([]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    getAllResto();
-  }, []);
+    if (isFocused) {
+      getAllResto();
+    }
+  }, [isFocused]);
 
   const getAllResto = async () => {
     try {
@@ -76,7 +78,7 @@ const HiddenGems = ({ navigation }) => {
   const renderCard = ({ item }) => (
     <View style={styles.card}>
       <Image
-        source={item.imageUrl ? { uri: item.imageUrl } : require('../../assets/onboarding1.png')}
+        source={item.imageUrl ? { uri: item.imageUrl } : require('../../assets/OnBoarding/onboarding1.png')}
         style={styles.image}
       />
 
@@ -121,21 +123,30 @@ const HiddenGems = ({ navigation }) => {
 
         {/* Scrollable Content */}
         <View style={styles.scrollWrapper}>
-          <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => navigation.navigate('Add')}
-            >
-              <Text style={styles.addButtonText}>+ Tambah Resto</Text>
-            </TouchableOpacity>
-
+          {filteredHiddenGems.length === 0 && search.trim() !== '' ? (
+            <View style={styles.emptyWrapper}>
+              <Text style={styles.emptyText}>Can't find the restaurant?</Text>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() =>
+                  navigation.navigate("Culinary", {
+                    screen: "AddRestoran",
+                  })
+                }
+              >
+                <Text style={styles.plus}>+ Add Restaurant</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
             <FlatList
-            data={filteredHiddenGems}
-            keyExtractor={(item) => item.id}
-            renderItem={renderCard}
-            contentContainerStyle={styles.flatListContent}
-            showsVerticalScrollIndicator={false}
+              data={filteredHiddenGems}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={renderCard}
+              contentContainerStyle={styles.flatListContent}
+              showsVerticalScrollIndicator={false}
             />
-      </View>
+          )}
+        </View>
     </View>
   );
 };
@@ -213,4 +224,30 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: 'PoppinsMedium',
   },
+  emptyWrapper: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 60,
+  },
+  emptyText: {
+    fontSize: 16,
+    fontFamily: 'PoppinsMedium',
+    color: '#555',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  addButton: {
+    backgroundColor: '#911F1B',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 100,
+  },
+  plus: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: 'PoppinsSemiBold',
+  },
+
 });

@@ -10,7 +10,11 @@ import Community from '../Community/Community';
 import Profile from '../Profile/Profile';
 import HiddenGems from '../Home/HiddenGems';
 import DetailHiddenGems from '../Home/DetailHiddenGems';
-import AddCulinary from '../Culinary/AddCulinary';
+import AddKuliner from '../Kuliner/Add';
+import DetailKuliner from '../Kuliner/DetailKuliner';
+import AddRestoran from '../Restoran/Add';
+import PickLocation from '../LocationMaps/PickLocation';
+import TasteBuds from '../Home/TasteBuds';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -21,6 +25,7 @@ function HomeStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomePage" component={HomePage} />
       <Stack.Screen name="HiddenGems" component={HiddenGems} />
+      {/* <Stack.Screen name="TasteBuds" component={TasteBuds} /> */}
       <Stack.Screen name="DetailHiddenGems" component={DetailHiddenGems} />
       <Stack.Screen name="Add" component={Add} />
       <Stack.Screen name="AddCulinary" component={AddCulinary} />
@@ -32,8 +37,12 @@ function HomeStack() {
 function CulinaryStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Culinary" component={Culinary} />
-      <Stack.Screen name="AddCulinary" component={AddCulinary} />
+      <Stack.Screen name="CulinaryTab" component={Culinary} />
+      <Stack.Screen name='AddKuliner' component={AddKuliner}/>
+      <Stack.Screen name='DetailKuliner' component={DetailKuliner}/>
+      <Stack.Screen name='AddRestoran' component={AddRestoran}/>
+      <Stack.Screen name='PickLocation' component={PickLocation}/>
+      {/* Tambahkan screen lain untuk Culinary jika diperlukan */}
     </Stack.Navigator>
   );
 }
@@ -42,7 +51,7 @@ function CulinaryStack() {
 function CommunityStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Community" component={Community} />
+      <Stack.Screen name="CommunityTab" component={Community} />
       {/* Tambahkan screen lain untuk Community jika diperlukan */}
     </Stack.Navigator>
   );
@@ -52,7 +61,7 @@ function CommunityStack() {
 function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="ProfileTab" component={Profile} />
       {/* Tambahkan screen lain untuk Profile jika diperlukan */}
     </Stack.Navigator>
   );
@@ -65,7 +74,7 @@ export default function MenuTab() {
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
 
-          if (route.name === 'HomePage') {
+          if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Culinary') {
             iconName = focused ? 'restaurant' : 'restaurant-outline';
@@ -77,12 +86,12 @@ export default function MenuTab() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007AFF',
+        tabBarActiveTintColor: '#911F1B',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
       })}
     >
-      <Tab.Screen name="HomePage" component={HomeStack} />
+      <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Culinary" component={CulinaryStack} />
       <Tab.Screen name="Community" component={CommunityStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />

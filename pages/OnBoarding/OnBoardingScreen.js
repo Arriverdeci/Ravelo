@@ -17,19 +17,19 @@ const slides = [
     id: '1',
     title: "Explore Food Anywhere",
     description: "Explore nearby restaurants or street food with additional information such as restaurant name, featured menu, ratings, and reviews through AR display.",
-    image: require('../../assets/onboarding1.png'),
+    image: require('../../assets/OnBoarding/onboarding1.png'),
   },
   {
     id: '2',
     title: "Find the Best Foods",
     description: "Discover the best flavors around you easily and quickly. This app helps you explore a variety of culinary options, from popular restaurants to local hidden gems.",
-    image: require('../../assets/onboarding2.png'),
+    image: require('../../assets/OnBoarding/onboarding2.png'),
   },
   {
     id: '3',
     title: "Scan to recognize Food",
     description: "Ravelo uses camera and AR technology to instantly recognize food types. Simply point the camera at a dish, and Ravelo will display information the name of the dish.",
-    image: require('../../assets/onboarding3.png'),
+    image: require('../../assets/OnBoarding/onboarding3.png'),
   },
 ];
 
@@ -47,12 +47,12 @@ const OnboardingScreen = () => {
     if (currentSlide < slides.length - 1) {
         flatListRef.current.scrollToIndex({ index: currentSlide + 1 });
     } else {
-        navigation.replace("MainTabs");
+        navigation.replace("Started");
     }
     };
 
     const skip = () => {
-    navigation.replace("MainTabs");
+    navigation.replace("Started");
     };
 
   const renderSlide = ({ item }) => (
@@ -64,7 +64,7 @@ const OnboardingScreen = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/logo_atas_ravelo.png')}
+        source={require('../../assets/OnBoarding/logo_atas_ravelo.png')}
         style={styles.logo}
         resizeMode="contain"
       />
@@ -119,8 +119,7 @@ const OnboardingScreen = () => {
                 <TouchableOpacity style={styles.getStartedButton} onPress={() => {
                 // Arahkan ke login/home screen di sini
                 console.log('Get Started clicked!');
-                navigation.replace("MainTabs");
-                // navigation.replace("AddRestoran");
+                navigation.replace("Started");
                 }}>
                 <Text style={styles.getStartedText}>Get Started</Text>
                 </TouchableOpacity>
