@@ -117,7 +117,6 @@ const OnboardingScreen = () => {
                 </>
             ) : (
                 <TouchableOpacity style={styles.getStartedButton} onPress={() => {
-                // Arahkan ke login/home screen di sini
                 console.log('Get Started clicked!');
                 navigation.replace("Started");
                 }}>
