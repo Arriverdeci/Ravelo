@@ -121,6 +121,7 @@ const HiddenGems = ({ navigation }) => {
       <HeaderBar
         searchValue={search}
         onChangeSearch={handleSearch}
+        onPressProfile={() => navigation.navigate('DetailProfile')}
         // onPressNotif={() => navigation.navigate('Notification')}
         onPressProfile={() => navigation.navigate('Profile')}
         onPressLanguage={() => setShowLangModal(true)} 

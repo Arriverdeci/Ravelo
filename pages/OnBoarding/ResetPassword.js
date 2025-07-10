@@ -5,33 +5,44 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
   Alert,
   Image,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
-const ForgotPassword = ({ navigation }) => {
-  const [username, setUsername] = useState("");
+const ResetPassword = ({ route, navigation }) => {
+  const { username } = route.params;
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRequestOtp = async () => {
-    if (!username) {
-      Alert.alert("Error", "Username is required");
+  const handleResetPassword = async () => {
+    if (!newPassword || !confirmPassword) {
+      Alert.alert("Error", "All fields are required");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
       return;
     }
 
     try {
-      const res = await axios.post("http://10.1.50.225:8080/api/otp/generate", { username });
-      const { otp } = res.data;
+      await axios.post("http://10.1.50.225:8080/api/otp/reset", {
+        username,
+        newPassword,
+      });
 
-      Alert.alert("OTP Sent", `Your OTP is: ${otp}`);
-
-      navigation.navigate("OTPVerification", { username });
+      Alert.alert("Success", "Password updated successfully!");
+      navigation.navigate("SuccessPage");
     } catch (error) {
-      Alert.alert("Error", error?.response?.data || "Failed to send OTP");
+      Alert.alert(
+        "Error",
+        error?.response?.data?.message || "Failed to reset password"
+      );
     }
   };
 
@@ -43,23 +54,34 @@ const ForgotPassword = ({ navigation }) => {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Reset your password</Text>
+        <Text style={styles.title}>Reset Your Password</Text>
         <Text style={styles.subtitle}>
-          Please enter your username to receive a one-time password (OTP) and reset your account.
+          Set a new password for your account so you can login and continue your journey.
         </Text>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.sectionTitle}>Forgot Password</Text>
+        <Text style={styles.sectionTitle}>Enter New Password</Text>
+
         <TextInput
           style={styles.input}
-          placeholder="Enter your username"
+          placeholder="New Password"
           placeholderTextColor="#999"
-          value={username}
-          onChangeText={setUsername}
+          secureTextEntry
+          value={newPassword}
+          onChangeText={setNewPassword}
         />
-        <TouchableOpacity style={styles.button} onPress={handleRequestOtp}>
-          <Text style={styles.buttonText}>Request OTP</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm New Password"
+          placeholderTextColor="#999"
+          secureTextEntry
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
+          <Text style={styles.buttonText}>Update Password</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -81,7 +103,6 @@ const styles = StyleSheet.create({
   logo: {
     width: width * 0.7,
     height: height * 0.2,
-    resizeMode: "contain",
   },
   title: {
     fontSize: 16,
@@ -121,7 +142,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 20,
     fontFamily: "PoppinsRegular",
-    fontSize: 14,
+    fontSize: 16,
     color: "#391713",
   },
   button: {
@@ -137,4 +158,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ForgotPassword;
+export default ResetPassword;

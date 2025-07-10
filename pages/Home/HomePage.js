@@ -218,6 +218,7 @@ const HomePage = () => {
       <HeaderBar
         searchValue={search}
         onChangeSearch={setSearch}
+        onPressProfile={() => navigation.navigate('DetailProfile')}
         onPressProfile={() => navigation.navigate('Profile')}
         onPressLanguage={() => setShowLangModal(true)} 
       />

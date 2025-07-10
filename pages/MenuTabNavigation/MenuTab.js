@@ -7,6 +7,7 @@ import HomePage from '../Home/HomePage';
 import Culinary from '../Culinary/Culinary';
 import Community from '../Community/Community';
 import Profile from '../Profile/Profile';
+import DetailProfile from '../Profile/DetailProfile';
 import HiddenGems from '../Home/HiddenGems';
 import DetailHiddenGems from '../Home/DetailHiddenGems';
 import AddKuliner from '../Kuliner/Add';
@@ -56,7 +57,7 @@ function CommunityStack() {
 function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="ProfileTab" component={Profile} />
+      <Stack.Screen name="DetailProfile" component={DetailProfile} />
       {/* Tambahkan screen lain untuk Profile jika diperlukan */}
     </Stack.Navigator>
   );
@@ -89,7 +90,7 @@ export default function MenuTab() {
       <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Culinary" component={CulinaryStack} />
       <Tab.Screen name="Community" component={CommunityStack} />
-      <Tab.Screen name="Profile" component={ProfileStack} />
+      <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );
 }

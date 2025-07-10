@@ -11,18 +11,20 @@ import {
   ScrollView,
 } from "react-native";
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
-const SignIn = ({ navigation }) => {
+const SignUp = ({ navigation }) => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleLogin = async () => {
-    if (!username || !password || !confirmPassword) {
-      Alert.alert("Error", "All fields are required.");
+  const handleSignUp = async () => {
+    if (!firstName || !lastName || !username || !phoneNumber || !password || !confirmPassword) {
+      Alert.alert("Error", "All fields are required!");
       return;
     }
 
@@ -32,18 +34,19 @@ const SignIn = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post("http://10.1.50.225:8080/api/users/login", {
+      const response = await axios.post("http://10.1.50.225:8080/api/users/register", {
+        firstName,
+        lastName,
         username,
+        phoneNumber,
         password,
         confirmPassword,
       });
 
-      await AsyncStorage.setItem("username", username);
-
-      navigation.navigate("NSignIn");
+      navigation.navigate("NSignUp");
     } catch (error) {
-      console.log("Login Error:", error);
-      const msg = error?.response?.data || "Login failed. Please try again.";
+      console.log(error);
+      const msg = error?.response?.data || "Registration failed.";
       Alert.alert("Error", msg);
     }
   };
@@ -56,20 +59,41 @@ const SignIn = ({ navigation }) => {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>
-            We’re so excited to see you again!</Text>
+        <Text style={styles.title}>Join Ravelo and start your taste adventure!  Get early access to top culinary spots, AR Maps, and a vibrant food community.</Text>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.sectionTitle}>Login to Your Account</Text>
+        <Text style={styles.sectionTitle}>Create New Account</Text>
 
         <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="First Name"
+            placeholderTextColor="#999"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Last Name"
+            placeholderTextColor="#999"
+            value={lastName}
+            onChangeText={setLastName}
+          />
           <TextInput
             style={styles.input}
             placeholder="Username"
             placeholderTextColor="#999"
             value={username}
             onChangeText={setUsername}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Mobile Number"
+            placeholderTextColor="#999"
+            keyboardType="phone-pad"
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
           />
           <TextInput
             style={styles.input}
@@ -90,21 +114,14 @@ const SignIn = ({ navigation }) => {
         </View>
 
         <TouchableOpacity
-          style={styles.forgotPasswordContainer}
-          onPress={() => navigation.navigate("ForgotPassword")}
-        >
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.signInButton} onPress={handleLogin}>
-          <Text style={styles.signInButtonText}>SIGN IN</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           style={styles.loginTextContainer}
-          onPress={() => navigation.navigate("SignUp")}
+          onPress={() => navigation.navigate("SignIn")}
         >
-          <Text style={styles.loginText}>Don't have an account? Sign Up</Text>
+          <Text style={styles.loginText}>Already have an account? Sign In</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
+          <Text style={styles.signUpButtonText}>SIGN UP</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -131,14 +148,22 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     color: "#FFFFFF",
-    textAlign: "center",        
+    textAlign: "center",
     fontFamily: "PoppinsRegular",
-    marginTop: 6,              
-    marginBottom: 12,
-    paddingHorizontal: 10,      
+    marginTop: 1,
+    marginBottom: 20,
+    marginLeft: 10,
+    marginRight: 10,
     lineHeight: 22,
-    alignSelf: "center",        
-    maxWidth: "80%",            
+  },
+  subtitle: {
+    fontSize: 15,
+    color: "#FFFFFF",
+    textAlign: "center",
+    fontFamily: "PoppinsRegular",
+    marginTop: 8,
+    marginBottom: 24,
+    lineHeight: 22,
   },
   content: {
     backgroundColor: "#fff",
@@ -154,7 +179,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   inputContainer: {
-    marginBottom: 8,
+    marginBottom: 16,
   },
   input: {
     height: 50,
@@ -167,36 +192,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#391713",
   },
-  forgotPasswordContainer: {
-    alignItems: "flex-end",
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    color: "#911F1B",
-    textDecorationLine: "underline",
-    fontFamily: "PoppinsMedium",
-  },
-  signInButton: {
-    backgroundColor: "#E6020B",
-    borderRadius: 100,
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-  signInButtonText: {
-    color: "#fff",
-    fontFamily: "PoppinsBold",
-    fontSize: 16,
-  },
   loginTextContainer: {
     alignSelf: "center",
-    marginTop: 24,
+    marginBottom: 24,
   },
   loginText: {
     color: "#E6020B",
     fontFamily: "PoppinsMedium",
     fontSize: 14,
   },
+  signUpButton: {
+    backgroundColor: "#E6020B",
+    borderRadius: 100,
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  signUpButtonText: {
+    color: "#fff",
+    fontFamily: "PoppinsBold",
+    fontSize: 16,
+  },
 });
 
-export default SignIn;
+export default SignUp;

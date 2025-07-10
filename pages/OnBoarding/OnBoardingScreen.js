@@ -48,12 +48,12 @@ const OnboardingScreen = () => {
     if (currentSlide < slides.length - 1) {
         flatListRef.current.scrollToIndex({ index: currentSlide + 1 });
     } else {
-        navigation.replace("MainTabs");
+        navigation.replace("Started");
     }
     };
 
     const skip = () => {
-    navigation.replace("MainTabs");
+    navigation.replace("Started");
     };
 
   const renderSlide = ({ item }) => (
@@ -118,10 +118,8 @@ const OnboardingScreen = () => {
                 </>
             ) : (
                 <TouchableOpacity style={styles.getStartedButton} onPress={() => {
-                // Arahkan ke login/home screen di sini
                 console.log('Get Started clicked!');
-                // navigation.replace("Started");
-                navigation.replace("MainTabs");
+                navigation.replace("Started");
                 }}>
                 <Text style={styles.getStartedText}>{i18n.t("getStarted")}</Text>
                 </TouchableOpacity>
