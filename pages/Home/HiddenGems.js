@@ -117,12 +117,17 @@ const HiddenGems = ({ navigation }) => {
         searchValue={search}
         onChangeSearch={handleSearch}
         onPressProfile={() => navigation.navigate('Profile')}
-        // onPressNotif={() => navigation.navigate('Notification')}
-        // onPressFilter={() => console.log('Filter tapped')}
       />
 
         {/* Scrollable Content */}
         <View style={styles.scrollWrapper}>
+          <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => navigation.navigate('Add')}
+            >
+              <Text style={styles.addButtonText}>+ Tambah Resto</Text>
+            </TouchableOpacity>
+
             <FlatList
             data={filteredHiddenGems}
             keyExtractor={(item) => item.id}

@@ -4,11 +4,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 
 import HomePage from '../Home/HomePage';
+import Add from '../Restoran/Add';
 import Culinary from '../Culinary/Culinary';
 import Community from '../Community/Community';
 import Profile from '../Profile/Profile';
 import HiddenGems from '../Home/HiddenGems';
 import DetailHiddenGems from '../Home/DetailHiddenGems';
+import AddCulinary from '../Culinary/AddCulinary';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -20,6 +22,8 @@ function HomeStack() {
       <Stack.Screen name="HomePage" component={HomePage} />
       <Stack.Screen name="HiddenGems" component={HiddenGems} />
       <Stack.Screen name="DetailHiddenGems" component={DetailHiddenGems} />
+      <Stack.Screen name="Add" component={Add} />
+      <Stack.Screen name="AddCulinary" component={AddCulinary} />
     </Stack.Navigator>
   );
 }
@@ -29,7 +33,7 @@ function CulinaryStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Culinary" component={Culinary} />
-      {/* Tambahkan screen lain untuk Culinary jika diperlukan */}
+      <Stack.Screen name="AddCulinary" component={AddCulinary} />
     </Stack.Navigator>
   );
 }
