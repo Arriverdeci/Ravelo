@@ -19,7 +19,7 @@ import { API_BASE_URL } from '../../api';
 const AddKuliner = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { restoranId } = route.params;
+  const restoranId = route.params?.restoranId;
   const [image, setImage] = useState(null);
   const [nama, setNama] = useState('');
   const [harga, setHarga] = useState('');

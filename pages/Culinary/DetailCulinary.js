@@ -5,7 +5,7 @@ import {
 import MapView, { Marker } from 'react-native-maps';
 import { useRoute } from '@react-navigation/native';
 
-const DetailKuliner = () => {
+const DetailCulinary = () => {
   const route = useRoute();
   const kuliner = route.params?.kuliner;
   if (!kuliner) {
@@ -83,7 +83,7 @@ const DetailKuliner = () => {
   );
 }
 
-export default DetailKuliner;
+export default DetailCulinary;
 
 const styles = StyleSheet.create({
   container: {

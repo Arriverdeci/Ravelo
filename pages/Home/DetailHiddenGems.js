@@ -306,7 +306,7 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
               style={styles.addButton}
               onPress={() =>
                 navigation.navigate("Culinary", {
-                  screen: "AddKuliner",
+                  screen: "AddCulinary",
                   params: { restoranId },
                 })
               }
@@ -482,32 +482,6 @@ const DetailHiddenGems = () => {
     { key: 'ratings', title: 'Ratings' },
   ]);
 
-
-  useEffect(() => {
-    const fetchRestaurant = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/resto/${restoranId}`);
-        const data = res.data;
-        setRestaurant({
-          id: data.restoranId,
-          name: data.namaRestoran,
-          city: data.kota,
-          address: data.alamat,
-          latitude: data.latitude,
-          longitude: data.longitude,
-          openingHours: data.jamOperasional,
-          phone: data.nomorTelepon,
-          image: data.fotoRestoran?.startsWith('http')
-            ? data.fotoRestoran
-            : `${API_BASE_URL}${data.fotoRestoran}`
-        });
-      } catch (err) {
-        console.error('Failed to fetch restaurant detail:', err);
-      }
-    };
-
-    fetchRestaurant();
-  }, [restoranId]);
 
   useEffect(() => {
     fetchRestaurantDetail();
