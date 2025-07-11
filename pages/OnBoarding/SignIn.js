@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 const SignIn = ({ navigation }) => {
   const [username, setUsername] = useState("");

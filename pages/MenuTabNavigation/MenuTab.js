@@ -25,7 +25,7 @@ function HomeStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomePage" component={HomePage} />
       <Stack.Screen name="HiddenGems" component={HiddenGems} />
-      {/* <Stack.Screen name="TasteBuds" component={TasteBuds} /> */}
+      <Stack.Screen name="TasteBuds" component={TasteBuds} />
       <Stack.Screen name="DetailHiddenGems" component={DetailHiddenGems} />
     </Stack.Navigator>
   );

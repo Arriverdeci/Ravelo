@@ -15,6 +15,7 @@ import { useNavigation, useRoute} from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { API_BASE_URL } from '../../api';
+import i18n from '../i18n';
 
 const AddKuliner = () => {
   const navigation = useNavigation();
@@ -85,10 +86,10 @@ const AddKuliner = () => {
   }, []);
 
   const handleImagePress = useCallback(() => {
-    Alert.alert("Upload Image", "Choose source", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Camera", onPress: () => takePhoto() },
-      { text: "Gallery", onPress: () => pickImage() },
+    Alert.alert(i18n.t("uploadImage"), i18n.t("chooseSource"), [
+      { text: i18n.t("cancel"), style: "cancel" },
+      { text: i18n.t("camera"), onPress: () => takePhoto() },
+      { text: i18n.t("gallery"), onPress: () => pickImage() },
     ]);
   }, [takePhoto, pickImage]);
 
@@ -147,9 +148,9 @@ const AddKuliner = () => {
     } catch (error) {
       console.error("Save failed:", error);
       setSaveQueue(prev => prev.map(item => item.id === saveId ? { ...item, status: 'error', error: error.message } : item));
-      Alert.alert("Save Failed", error.message, [
+      Alert.alert(i18n.t("saveFailed"), error.message, [
         { text: "OK" },
-        { text: "Retry", onPress: () => retryFailedSave(saveId, formData, imageUri) },
+        { text: i18n.t("retry"), onPress: () => retryFailedSave(saveId, formData, imageUri) },
       ]);
     }
   };
@@ -164,10 +165,10 @@ const AddKuliner = () => {
   };
 
   const handleSave = async () => {
-    if (!nama.trim()) return Alert.alert("Error", "Dish name is required");
-    if (!harga.trim()) return Alert.alert("Error", "Price is required");
-    if (!deskripsi.trim()) return Alert.alert("Error", "Description is required");
-    if (!image) return Alert.alert("Error", "Please add dish photo");
+    if (!nama.trim()) return Alert.alert("Error", i18n.t("dishNameRequired"));
+    if (!harga.trim()) return Alert.alert("Error", i18n.t("priceRequired"));
+    if (!deskripsi.trim()) return Alert.alert("Error", i18n.t("descriptionRequired"));
+    if (!image) return Alert.alert("Error", i18n.t("photoRequired"));
 
     const selectedKategori = Object.entries(kategori)
         .filter(([_, isSelected]) => isSelected)
@@ -200,12 +201,12 @@ const AddKuliner = () => {
         {hasActive && (
           <View>
             <ActivityIndicator size="small" color="#911F1B" />
-            <Text>Saving menu...</Text>
+            <Text>{i18n.t("savingMenu")}</Text>
           </View>
         )}
         {errors.map(item => (
           <TouchableOpacity key={item.id} onPress={() => retryFailedSave(item.id, {}, null)}>
-            <Text>❌ {item.name} failed - Tap to retry</Text>
+            <Text>❌ {item.name} {i18n.t("saveFailed")} - {i18n.t("tapToRetry")}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -219,9 +220,9 @@ const AddKuliner = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={require('../../assets/ic_left_arrow.png')} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.title}>New Menu</Text>
+        <Text style={styles.title}>{i18n.t("addMenuTitle")}</Text>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Save</Text>
+          <Text style={styles.saveButtonText}>{i18n.t("save")}</Text>
         </TouchableOpacity>
       </View>
 
@@ -238,8 +239,8 @@ const AddKuliner = () => {
                 source={require('../../assets/ic_pictupload.png')}
                 style={styles.placeholderIcon}
               />
-              <Text style={styles.placeholderText}>Tap to add photo</Text>
-              <Text style={styles.placeholderSubText}>Camera or Gallery</Text>
+              <Text style={styles.placeholderText}>{i18n.t("tapToAddPhoto")}</Text>
+              <Text style={styles.placeholderSubText}>{i18n.t("cameraOrGallery")}</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -248,33 +249,33 @@ const AddKuliner = () => {
       {/* Inputs */}
       <TextInput
         style={styles.input}
-        placeholder="Dish Name"
+        placeholder={i18n.t("dishName")}
         value={nama}
         onChangeText={setNama}
       />
       <TextInput
         style={styles.input}
-        placeholder="Price"
+        placeholder={i18n.t("price")}
         value={harga}
         onChangeText={setHarga}
         keyboardType="numeric"
       />
       <TextInput
         style={[styles.input, { height: 90, textAlignVertical: 'top' }]}
-        placeholder="Description"
+        placeholder={i18n.t("description")}
         value={deskripsi}
         onChangeText={setDeskripsi}
         multiline
         numberOfLines={4}
       />
 
-      <Text style={styles.sectionLabel}>Category</Text>
+      <Text style={styles.sectionLabel}>{i18n.t("category")}</Text>
       <View style={styles.checkboxGroup}>
         {Object.entries(kategori).map(([key, value]) => (
           <Pressable key={key} style={styles.checkboxRow} onPress={() => handleKategoriChange(key)}>
             <View style={[styles.checkbox, value && styles.checkboxChecked]} />
             <Text style={styles.checkboxLabel}>
-              {key.charAt(0).toUpperCase() + key.slice(1)}
+              {i18n.t("category_" + key)}
             </Text>
           </Pressable>
         ))}

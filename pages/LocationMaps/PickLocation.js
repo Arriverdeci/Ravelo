@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
+import i18n from "../i18n";
 
 const PickLocation = ({ route }) => {
   const navigation = useNavigation();
@@ -14,31 +15,29 @@ const PickLocation = ({ route }) => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          Alert.alert("Permission denied", "Location access is required.");
+          Alert.alert(i18n.t("error"), i18n.t("locationRequired"));
           return;
         }
 
         const loc = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
         });
-        
+
         const initialRegion = {
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         };
-        
+
         setLocation(initialRegion);
-        
+
         if (route.params?.currentLocation) {
-          // console.log("Setting current location from params:", route.params.currentLocation);
           setSelectedLocation(route.params.currentLocation);
         }
-        
       } catch (error) {
         console.error("Error getting location permission:", error);
-        // Alert.alert("Error", "Failed to get current location");
+        Alert.alert(i18n.t("error"), i18n.t("locationRequired"));
       }
     };
 
@@ -47,26 +46,19 @@ const PickLocation = ({ route }) => {
 
   const handleSelectLocation = (event) => {
     const coordinate = event.nativeEvent.coordinate;
-    // console.log("Location selected:", coordinate);
     setSelectedLocation(coordinate);
   };
 
   const handleSaveLocation = () => {
     if (!selectedLocation) {
-      Alert.alert("No location selected", "Please tap on the map to select a location.");
+      Alert.alert(i18n.t("error"), i18n.t("locationRequired"));
       return;
     }
-
-    // console.log("Saving location and navigating back with:", {
-    //   selectedLocation,
-    //   formData: route.params?.formData
-    // });
 
     navigation.navigate("AddRestoran", {
       selectedLocation,
       formData: route.params?.formData,
     });
-
   };
 
   const handleCancel = () => {
@@ -78,7 +70,7 @@ const PickLocation = ({ route }) => {
   if (!location) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Loading map...</Text>
+        <Text style={styles.loadingText}>{i18n.t("loadingMap") || "Loading map..."}</Text>
       </View>
     );
   }
@@ -95,8 +87,8 @@ const PickLocation = ({ route }) => {
         {selectedLocation && (
           <Marker
             coordinate={selectedLocation}
-            title="Selected Location"
-            description="Restaurant will be placed here"
+            title={i18n.t("selectedLocation") || "Selected Location"}
+            description={i18n.t("restaurantLocationHint") || "Restaurant will be placed here"}
             pinColor="red"
           />
         )}
@@ -106,26 +98,23 @@ const PickLocation = ({ route }) => {
         {selectedLocation && (
           <View style={styles.coordinatesContainer}>
             <Text style={styles.coordinatesText}>
-              Selected: {selectedLocation.latitude.toFixed(6)}, {selectedLocation.longitude.toFixed(6)}
+              {`${i18n.t("selected") || "Selected"}: ${selectedLocation.latitude.toFixed(6)}, ${selectedLocation.longitude.toFixed(6)}`}
             </Text>
           </View>
         )}
-        
+
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-            <Text style={styles.cancelButtonText}>Cancel</Text>
+            <Text style={styles.cancelButtonText}>{i18n.t("cancel")}</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[
-              styles.saveButton, 
-              !selectedLocation && styles.saveButtonDisabled
-            ]} 
+
+          <TouchableOpacity
+            style={[styles.saveButton, !selectedLocation && styles.saveButtonDisabled]}
             onPress={handleSaveLocation}
             disabled={!selectedLocation}
           >
             <Text style={styles.saveButtonText}>
-              {selectedLocation ? 'Save Location' : 'Select Location'}
+              {selectedLocation ? i18n.t("save") : i18n.t("tapToSelectLocation")}
             </Text>
           </TouchableOpacity>
         </View>
