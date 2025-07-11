@@ -373,7 +373,6 @@ const HomePage = () => {
                   ? { uri: `${API_BASE_URL}${item.fotoMakanan}` }
                   : require("../../assets/logo_ravelo.png")
               }
-              // title={item.namaMakanan}
               rating={item.totalRating || 0}
               distance={item.jarakKm?.toFixed(1) || "0.0"}
             />

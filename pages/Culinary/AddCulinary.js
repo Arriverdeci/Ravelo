@@ -105,6 +105,7 @@ const AddCulinary = () => {
       type: "image/jpeg",
       name: `kuliner_${Date.now()}.jpg`,
     });
+    
     const response = await fetch(`${API_BASE_URL}/kuliner/upload`, {
       method: "POST",
       headers: { "Content-Type": "multipart/form-data" },
