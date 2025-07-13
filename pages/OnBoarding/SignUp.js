@@ -34,7 +34,7 @@ const SignUp = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post("http://10.1.50.225:8080/api/users/register", {
+      const response = await axios.post("http://10.1.50.74:8080/api/users/register", {
         firstName,
         lastName,
         username,

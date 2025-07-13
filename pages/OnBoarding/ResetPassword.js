@@ -31,7 +31,7 @@ const ResetPassword = ({ route, navigation }) => {
     }
 
     try {
-      await axios.post("http://10.1.50.225:8080/api/otp/reset", {
+      await axios.post("http://10.1.50.74:8080/api/otp/reset", {
         username,
         newPassword,
       });

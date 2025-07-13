@@ -5,12 +5,13 @@ import { Ionicons } from '@expo/vector-icons';
 
 import HomePage from '../Home/HomePage';
 import Culinary from '../Culinary/Culinary';
+import AddCulinary from '../Culinary/AddCulinary';
+import DetailCulinary from '../Culinary/DetailCulinary';
 import Community from '../Community/Community';
 import Profile from '../Profile/Profile';
 import DetailProfile from '../Profile/DetailProfile';
 import HiddenGems from '../Home/HiddenGems';
 import DetailHiddenGems from '../Home/DetailHiddenGems';
-import AddKuliner from '../Kuliner/Add';
 import AddRestoran from '../Restoran/Add';
 import PickLocation from '../LocationMaps/PickLocation';
 import TasteBuds from '../Home/TasteBuds';
@@ -34,11 +35,11 @@ function HomeStack() {
 function CulinaryStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="CulinaryTab" component={Culinary} />
-      <Stack.Screen name='AddKuliner' component={AddKuliner}/>
+      <Stack.Screen name="Culinary" component={Culinary} />
+      <Stack.Screen name='AddCulinary' component={AddCulinary}/>
+      <Stack.Screen name='DetailCulinary' component={DetailCulinary}/>
       <Stack.Screen name='AddRestoran' component={AddRestoran}/>
       <Stack.Screen name='PickLocation' component={PickLocation}/>
-      {/* Tambahkan screen lain untuk Culinary jika diperlukan */}
     </Stack.Navigator>
   );
 }

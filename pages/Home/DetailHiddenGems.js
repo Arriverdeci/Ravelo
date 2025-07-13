@@ -307,7 +307,7 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
               style={styles.addButton}
               onPress={() =>
                 navigation.navigate("Culinary", {
-                  screen: "AddKuliner",
+                  screen: "AddCulinary",
                   params: { restoranId },
                 })
               }
