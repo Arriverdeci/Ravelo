@@ -14,6 +14,7 @@ import {
   Dimensions,
   FlatList
 } from "react-native";
+import i18n from '../i18n';
 
 const { width } = Dimensions.get("window");
 
@@ -28,6 +29,8 @@ const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [promoIndex, setPromoIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [locale, setLocale] = useState(i18n.locale);
+  const [showLangModal, setShowLangModal] = useState(false);
 
   useEffect(() => {
     if (isFocused) {
@@ -35,6 +38,11 @@ const HomePage = () => {
       getKulinerData();
     }
   }, [isFocused]);
+
+  const filteredSearchKuliner = kulinerList.filter(item =>
+    item.namaMakanan?.toLowerCase().includes(search.toLowerCase()) ||
+    item.namaRestoran?.toLowerCase().includes(search.toLowerCase())
+  );
 
   const getCurrentLocation = async () => {
     try {
@@ -191,51 +199,64 @@ const HomePage = () => {
     item => (item.totalRating || 0) >= 4
   );
 
+  const categories = [
+    { key: "Food", icon: require("../../assets/ic_food.png"), label: i18n.t("categoryFood") },
+    { key: "Drink", icon: require("../../assets/ic_drinks.png"), label: i18n.t("categoryDrink") },
+    { key: "Dessert", icon: require("../../assets/ic_desserts.png"), label: i18n.t("categoryDessert") },
+    { key: "Snack", icon: require("../../assets/ic_snacks.png"), label: i18n.t("categorySnack") },
+    { key: "Coffee", icon: require("../../assets/ic_coffee.png"), label: i18n.t("categoryCoffee") },
+  ];
+
+  const translateCategory = (key) => {
+    switch (key) {
+      case 'Food': return i18n.t("categoryFood");
+      case 'Drink': return i18n.t("categoryDrink");
+      case 'Dessert': return i18n.t("categoryDessert");
+      case 'Snack': return i18n.t("categorySnack");
+      case 'Coffee': return i18n.t("categoryCoffee");
+      default: return key;
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <HeaderBar
         searchValue={search}
         onChangeSearch={setSearch}
         onPressProfile={() => navigation.navigate('DetailProfile')}
+        onPressLanguage={() => setShowLangModal(true)} 
       />
-
       <FlatList
         style={styles.scrollContent}
         ListHeaderComponent={
           <View>
             {/* CATEGORY */}
-            <View style={styles.section}>
+            <View style={[styles.section]}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {[
-                  { name: "Food", icon: require("../../assets/ic_food.png") },
-                  { name: "Drink", icon: require("../../assets/ic_drinks.png") },
-                  { name: "Dessert", icon: require("../../assets/ic_desserts.png") },
-                  { name: "Snack", icon: require("../../assets/ic_snacks.png") },
-                  { name: "Coffee", icon: require("../../assets/ic_coffee.png") },
-                ].map((item, index) => (
+                {categories.map((item, index) => (
                   <TouchableOpacity
                     key={index}
-                    onPress={() => setSelectedCategory(item.name)}
+                    onPress={() => setSelectedCategory(item.key)}
                     style={styles.categoryItem}
                   >
                     <View style={[
                       styles.categoryIconContainer,
-                      selectedCategory === item.name && styles.categoryIconContainerSelected,
+                      selectedCategory === item.key && styles.categoryIconContainerSelected,
                     ]}>
                       <Image
                         source={item.icon}
                         style={[
                           styles.categoryIcon,
-                          selectedCategory === item.name && styles.categoryIconSelected
+                          selectedCategory === item.key && styles.categoryIconSelected
                         ]}
                         resizeMode="contain"
                       />
                     </View>
                     <Text style={[
                       styles.categoryLabel,
-                      selectedCategory === item.name && styles.categoryLabelSelected
+                      selectedCategory === item.key && styles.categoryLabelSelected
                     ]}>
-                      {item.name}
+                      {item.label}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -243,23 +264,27 @@ const HomePage = () => {
               <View style={styles.categoryUnderline} />
             </View>
 
-            {selectedCategory !== "" ? (
+            {/* Back and title when filter category is active */}
+            {selectedCategory !== "" && (
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>{selectedCategory} for You</Text>
+                <Text style={styles.sectionTitle}>{translateCategory(selectedCategory)}</Text>
                 <TouchableOpacity onPress={() => setSelectedCategory("")}>
-                  <Text style={styles.viewAllText}>← Back</Text>
+                  <Text style={styles.viewAllText}>{i18n.t('back')}</Text>
                 </TouchableOpacity>
               </View>
-            ) : (
+            )}
+            
+            {/* Show hidden gems + promo + for you if no search and no filter */}
+            {selectedCategory === "" && search.trim() === "" && (
               <View>
                 {/* Hidden Gems Section */}
                 <View style={styles.section}>
                   <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>Hidden Gems</Text>
+                    <Text style={styles.sectionTitle}>{i18n.t('hiddenGems')}</Text>
                     <TouchableOpacity 
                       style={styles.viewAll}
                       onPress={() => navigation.navigate('HiddenGems')}>
-                      <Text style={styles.viewAllText}>View All</Text>
+                      <Text style={styles.viewAllText}>{i18n.t('viewAll')}</Text>
                       <Image
                         source={require("../../assets/ic_right_arrow.png")}
                         style={styles.arrowIcon}
@@ -277,7 +302,7 @@ const HomePage = () => {
                     <View style={styles.errorContainer}>
                       <Text style={styles.errorText}>📍 {locationError}</Text>
                       <TouchableOpacity style={styles.retryButton} onPress={getCurrentLocation}>
-                        <Text style={styles.retryText}>Try Again</Text>
+                        <Text style={styles.retryText}>{i18n.t('retryText')}</Text>
                       </TouchableOpacity>
                     </View>
                   ) : hiddenGems.length > 0 ? (
@@ -288,10 +313,10 @@ const HomePage = () => {
                       keyExtractor={(item, index) => item.id ? item.id.toString() : `item_${index}`}
                       contentContainerStyle={{ paddingHorizontal: 16 }}
                       renderItem={({ item }) => (
-                        <TouchableOpacity onPress={() => { console.log("Navigating to DetailHiddenGems with ID:", item.id); navigation.navigate('DetailHiddenGems', { restoranId: item.id })}}>
+                        <TouchableOpacity onPress={() => { navigation.navigate('DetailHiddenGems', { restoranId: item.id })}}>
                           <HiddenGemsCard
                             imageSource={
-                              item.image_url 
+                              item.image_url && item.image_url !== 'null'
                                 ? { uri: item.image_url }
                                 : require("../../assets/logo_ravelo.png")
                             }
@@ -303,7 +328,7 @@ const HomePage = () => {
                     />
                   ) : (
                     <View style={styles.emptyContainer}>
-                      <Text style={styles.emptyText}>No restaurants found</Text>
+                      <Text style={styles.emptyText}>{i18n.t('emptyTextHome')}</Text>
                     </View>
                   )}
                 </View>
@@ -343,12 +368,16 @@ const HomePage = () => {
                   </View>
                 </View>
 
-                {/* For Your Taste Buds Header */}
+                {/* For Your Taste Buds */}
                 <View style={styles.section}>
                   <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>For Your Taste Buds</Text>
+                    <Text style={styles.sectionTitle}>{i18n.t('forYou')}</Text>
                     <TouchableOpacity style={styles.viewAll}>
-                      <Text style={styles.viewAllText}>View All</Text>
+                      <Text 
+                        style={styles.viewAllText}
+                        onPress={() => navigation.navigate('TasteBuds')}>
+                        {i18n.t('viewAll')}
+                      </Text>
                       <Image
                         source={require("../../assets/ic_right_arrow.png")}
                         style={styles.arrowIcon}
@@ -360,7 +389,13 @@ const HomePage = () => {
             )}
           </View>
         }
-        data={selectedCategory !== "" ? filteredKulinerByCategory : filteredKulinerList}
+        data={
+          selectedCategory !== ""
+            ? filteredKulinerByCategory
+            : search.trim() !== ""
+            ? filteredSearchKuliner
+            : filteredKulinerList
+        }
         keyExtractor={(item, index) => item.kulinerId?.toString() || `kuliner_${index}`}
         numColumns={2}
         columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 16 }}
@@ -373,13 +408,44 @@ const HomePage = () => {
                   ? { uri: `${API_BASE_URL}${item.fotoMakanan}` }
                   : require("../../assets/logo_ravelo.png")
               }
-              // title={item.namaMakanan}
               rating={item.totalRating || 0}
               distance={item.jarakKm?.toFixed(1) || "0.0"}
             />
           </TouchableOpacity>
         )}
       />
+
+      {showLangModal && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>{i18n.t('chooseLanguage')}</Text>
+            <TouchableOpacity
+              style={styles.langOption}
+              onPress={() => {
+                i18n.locale = 'id';
+                setLocale('id');
+                setShowLangModal(false);
+              }}
+            >
+              <Text style={styles.langText}>🇮🇩 {i18n.t('bahasaIndo')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.langOption}
+              onPress={() => {
+                i18n.locale = 'en';
+                setLocale('en');
+                setShowLangModal(false);
+              }}
+            >
+              <Text style={styles.langText}>🇺🇸 {i18n.t('bahasaEng')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowLangModal(false)}>
+              <Text style={styles.cancelText}>❌ {i18n.t('cancelLang')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
     </View>
   );
 };
@@ -618,6 +684,48 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#666',
   },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+  modalBox: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    width: 280,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    fontFamily: 'PoppinsMedium',
+  },
+  langOption: {
+    paddingVertical: 10,
+    width: '100%',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  langText: {
+    fontSize: 16,
+    fontFamily: 'PoppinsRegular',
+  },
+  cancelText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: 'red',
+    fontFamily: 'PoppinsRegular',
+  },
+
 });
 
 export default HomePage;

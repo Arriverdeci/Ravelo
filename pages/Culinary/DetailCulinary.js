@@ -5,9 +5,17 @@ import {
 import MapView, { Marker } from 'react-native-maps';
 import { useRoute } from '@react-navigation/native';
 
-const DetailKuliner = () => {
+const DetailCulinary = () => {
   const route = useRoute();
-  const { kuliner } = route.params; 
+  const kuliner = route.params?.kuliner;
+  if (!kuliner) {
+  return (
+      <View style={styles.container}>
+        <Text style={{ padding: 20, color: 'red' }}>No dish data found.</Text>
+      </View>
+    );
+  }
+
 
   const [favorit, setFavorit] = useState(false);
 
@@ -75,7 +83,7 @@ const DetailKuliner = () => {
   );
 }
 
-export default DetailKuliner;
+export default DetailCulinary;
 
 const styles = StyleSheet.create({
   container: {

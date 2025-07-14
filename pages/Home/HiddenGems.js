@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
+import i18n from '../i18n';
 
 const HiddenGems = ({ navigation }) => {
   const [search, setSearch] = useState('');
@@ -18,6 +19,8 @@ const HiddenGems = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [filteredHiddenGems, setFilteredHiddenGems] = useState([]);
   const isFocused = useIsFocused();
+  const [locale, setLocale] = useState(i18n.locale);
+  const [showLangModal, setShowLangModal] = useState(false);
 
   useEffect(() => {
     if (isFocused) {
@@ -108,7 +111,7 @@ const HiddenGems = ({ navigation }) => {
           navigation.navigate('DetailHiddenGems', { restoranId: item.id })
         }
       >
-        <Text style={styles.buttonText}>See Detail</Text>
+        <Text style={styles.buttonText}>{i18n.t('seeDetail')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -120,14 +123,14 @@ const HiddenGems = ({ navigation }) => {
         onChangeSearch={handleSearch}
         onPressProfile={() => navigation.navigate('DetailProfile')}
         // onPressNotif={() => navigation.navigate('Notification')}
-        // onPressFilter={() => console.log('Filter tapped')}
+        onPressLanguage={() => setShowLangModal(true)} 
       />
 
         {/* Scrollable Content */}
         <View style={styles.scrollWrapper}>
           {filteredHiddenGems.length === 0 && search.trim() !== '' ? (
             <View style={styles.emptyWrapper}>
-              <Text style={styles.emptyText}>Can't find the restaurant?</Text>
+              <Text style={styles.emptyText}>{i18n.t('notFound')}</Text>
               <TouchableOpacity
                 style={styles.addButton}
                 onPress={() =>
@@ -136,7 +139,7 @@ const HiddenGems = ({ navigation }) => {
                   })
                 }
               >
-                <Text style={styles.plus}>+ Add Restaurant</Text>
+                <Text style={styles.plus}>{i18n.t('addRestaurant')}</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -148,6 +151,37 @@ const HiddenGems = ({ navigation }) => {
               showsVerticalScrollIndicator={false}
             />
           )}
+
+            {showLangModal && (
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalBox}>
+                  <Text style={styles.modalTitle}>{i18n.t('chooseLanguage')}</Text>
+                  <TouchableOpacity
+                    style={styles.langOption}
+                    onPress={() => {
+                      i18n.locale = 'id';
+                      setLocale('id');
+                      setShowLangModal(false);
+                    }}
+                  >
+                    <Text style={styles.langText}>🇮🇩 {i18n.t('bahasaIndo')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.langOption}
+                    onPress={() => {
+                      i18n.locale = 'en';
+                      setLocale('en');
+                      setShowLangModal(false);
+                    }}
+                  >
+                    <Text style={styles.langText}>🇺🇸 {i18n.t('bahasaEng')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setShowLangModal(false)}>
+                    <Text style={styles.cancelText}>❌ {i18n.t('cancelLang')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
         </View>
     </View>
   );
@@ -250,6 +284,47 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontFamily: 'PoppinsSemiBold',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+  modalBox: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    width: 280,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    fontFamily: 'PoppinsMedium',
+  },
+  langOption: {
+    paddingVertical: 10,
+    width: '100%',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  langText: {
+    fontSize: 16,
+    fontFamily: 'PoppinsRegular',
+  },
+  cancelText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: 'red',
+    fontFamily: 'PoppinsRegular',
   },
 
 });

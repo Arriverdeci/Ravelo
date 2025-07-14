@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   },
   successText: {
     fontSize: 36,
-    fontFamily: "PoppinsBold",
+    fontFamily: 'PoppinsBold',
     color: "#FFFFFF",
     textAlign: "center",
     marginBottom: 30,
@@ -55,6 +55,6 @@ const styles = StyleSheet.create({
   signInButtonText: {
     color: "#911F1B",
     fontSize: 16,
-    fontFamily: "PoppinsSemiBold",
+    fontFamily: 'PoppinsSemiBold',
   },
 });

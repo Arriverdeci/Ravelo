@@ -39,7 +39,7 @@ const OTPVerification = ({ route, navigation }) => {
     }
 
     try {
-      await axios.post("http://10.1.50.225:8080/api/otp/verify", {
+      await axios.post("http://10.1.50.74:8080/api/otp/verify", {
         username,
         otp,
       });
@@ -53,7 +53,7 @@ const OTPVerification = ({ route, navigation }) => {
 
   const handleResendOtp = async () => {
     try {
-      const res = await axios.post("http://10.1.50.225:8080/api/otp/generate", { username });
+      const res = await axios.post("http://10.1.50.74:8080/api/otp/generate", { username });
       const { otp } = res.data;
       Alert.alert("OTP Resent", `Your new OTP is: ${otp}`);
       setTimeLeft(60);

@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import axios from "axios";
+import { API_BASE_URL } from '../../api';
 
 const { width, height } = Dimensions.get("window");
 
@@ -34,8 +35,7 @@ const SignUp = ({ navigation }) => {
     }
 
     try {
-      // const response = await axios.post("http://10.1.50.225:8080/api/users/register", {
-      const response = await axios.post("http://192.168.1.17:8080/api/users/register", {
+      const response = await axios.post(`${API_BASE_URL}/api/users/register`, {
         firstName,
         lastName,
         username,

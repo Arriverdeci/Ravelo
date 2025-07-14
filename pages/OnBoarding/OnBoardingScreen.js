@@ -9,34 +9,35 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
+import i18n from "../i18n";
 
 const { width, height } = Dimensions.get("window");
-
-const slides = [
-  {
-    id: '1',
-    title: "Explore Food Anywhere",
-    description: "Explore nearby restaurants or street food with additional information such as restaurant name, featured menu, ratings, and reviews through AR display.",
-    image: require('../../assets/OnBoarding/onboarding1.png'),
-  },
-  {
-    id: '2',
-    title: "Find the Best Foods",
-    description: "Discover the best flavors around you easily and quickly. This app helps you explore a variety of culinary options, from popular restaurants to local hidden gems.",
-    image: require('../../assets/OnBoarding/onboarding2.png'),
-  },
-  {
-    id: '3',
-    title: "Scan to recognize Food",
-    description: "Ravelo uses camera and AR technology to instantly recognize food types. Simply point the camera at a dish, and Ravelo will display information the name of the dish.",
-    image: require('../../assets/OnBoarding/onboarding3.png'),
-  },
-];
 
 const OnboardingScreen = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigation = useNavigation();
   const flatListRef = useRef(null);
+
+  const slides = [
+    {
+      id: '1',
+      title: i18n.t("onboarding1Title"),
+      description: i18n.t("onboarding1Desc"),
+      image: require('../../assets/OnBoarding/onboarding1.png'),
+    },
+    {
+      id: '2',
+      title: i18n.t("onboarding2Title"),
+      description: i18n.t("onboarding2Desc"),
+      image: require('../../assets/OnBoarding/onboarding2.png'),
+    },
+    {
+      id: '3',
+      title: i18n.t("onboarding3Title"),
+      description: i18n.t("onboarding3Desc"),
+      image: require('../../assets/OnBoarding/onboarding3.png'),
+    },
+  ];
 
   const handleScroll = (event) => {
     const slide = Math.round(event.nativeEvent.contentOffset.x / width);
@@ -108,20 +109,19 @@ const OnboardingScreen = () => {
             {currentSlide < slides.length - 1 ? (
                 <>
                 <TouchableOpacity style={styles.skipButton} onPress={skip}>
-                    <Text style={styles.skipText}>Skip</Text>
+                    <Text style={styles.skipText}>{i18n.t("skip")}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.nextButton} onPress={goNext}>
-                    <Text style={styles.nextText}>Next</Text>
+                    <Text style={styles.nextText}>{i18n.t("next")}</Text>
                 </TouchableOpacity>
                 </>
             ) : (
                 <TouchableOpacity style={styles.getStartedButton} onPress={() => {
-                // Arahkan ke login/home screen di sini
                 console.log('Get Started clicked!');
                 navigation.replace("Started");
                 }}>
-                <Text style={styles.getStartedText}>Get Started</Text>
+                <Text style={styles.getStartedText}>{i18n.t("getStarted")}</Text>
                 </TouchableOpacity>
             )}
         </View>

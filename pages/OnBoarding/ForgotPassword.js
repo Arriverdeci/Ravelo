@@ -24,7 +24,7 @@ const ForgotPassword = ({ navigation }) => {
     }
 
     try {
-      const res = await axios.post("http://10.1.50.225:8080/api/otp/generate", { username });
+      const res = await axios.post("http://10.1.50.74:8080/api/otp/generate", { username });
       const { otp } = res.data;
 
       Alert.alert("OTP Sent", `Your OTP is: ${otp}`);

@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { API_BASE_URL } from '../../api';
 
 const EditProfile = () => {
   const navigation = useNavigation();
@@ -28,7 +29,7 @@ const EditProfile = () => {
       if (storedUsername) {
         setUsername(storedUsername);
         try {
-          const res = await axios.get(`http://10.1.50.225:8080/api/users/${storedUsername}/profile`);
+          const res = await axios.get(`${API_BASE_URL}/api/users/${storedUsername}/profile`);
           setFullName(res.data.fullName);
           setEmail(res.data.email || '');
           setAddress(res.data.address || '');
@@ -43,7 +44,7 @@ const EditProfile = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://10.1.50.225:8080/api/users/${username}`, {
+      await axios.put(`${API_BASE_URL}/api/users/${username}`, {
         email,
         address,
         phoneNumber,
@@ -144,8 +145,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontFamily: 'PoppinsMedium',
     color: '#000000',
     marginLeft: 10,
   },
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
   editPhotoText: {
     color: '#911F1B',
     fontSize: 14,
-    fontWeight: '500',
+    fontFamily: 'PoppinsMedium',
   },
   section: {
     paddingVertical: 15,
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 16,
     color: '#000000',
-    fontWeight: '500',
+    fontFamily: 'PoppinsRegular',
     borderBottomWidth: 1,
     borderColor: '#ccc',
     paddingVertical: 5,
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'PoppinsMedium',
   },
 });
 

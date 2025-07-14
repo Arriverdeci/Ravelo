@@ -44,14 +44,14 @@ const styles = StyleSheet.create({
     fontSize: 36,
     color: "#FFFFFF",
     textAlign: "center",
-    fontFamily: "PoppinsBold",
+    fontFamily: 'PoppinsBold',
     marginBottom: 20,
   },
   tagline: {
     fontSize: 14,
     color: "#FFFFFF",
     textAlign: "center",
-    fontFamily: "PoppinsMedium",
+    fontFamily: 'PoppinsMedium',
     lineHeight: 20,
   },
 });

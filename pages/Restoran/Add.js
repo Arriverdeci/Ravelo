@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 import MapView, { Marker } from "react-native-maps";
-import { API_BASE_URL } from '../../api'
+import { API_BASE_URL } from '../../api';
 import * as FileSystem from 'expo-file-system';
 import HomePage from "../Home/HomePage";
 import {
@@ -16,6 +16,7 @@ import {
   Alert,
   ActivityIndicator
 } from "react-native";
+import i18n from '../i18n';
 
 const AddRestoran = () => {
   const [image, setImage] = useState(null);
@@ -298,26 +299,27 @@ const AddRestoran = () => {
   // Main save handler
   const handleSave = async () => {
     // Validasi form
-    if (!namaRestoran.trim()) {
-      Alert.alert("Error", "Restaurant name is required");
-      return;
-    }
-    if (!kota.trim()) {
-      Alert.alert("Error", "City is required");
-      return;
-    }
-    if (!alamat.trim()) {
-      Alert.alert("Error", "Address is required");
-      return;
-    }
-    if (!pickedLocation) {
-      Alert.alert("Error", "Please select location on map");
-      return;
-    }
-    if (!image) {
-      Alert.alert("Error", "Please add restaurant photo");
-      return;
-    }
+    
+  if (!namaRestoran.trim()) {
+    Alert.alert(i18n.t("error"), i18n.t("restaurantNameRequired"));
+    return;
+  }
+  if (!kota.trim()) {
+    Alert.alert(i18n.t("error"), i18n.t("cityRequired"));
+    return;
+  }
+  if (!alamat.trim()) {
+    Alert.alert(i18n.t("error"), i18n.t("addressRequired"));
+    return;
+  }
+  if (!pickedLocation) {
+    Alert.alert(i18n.t("error"), i18n.t("locationRequired"));
+    return;
+  }
+  if (!image) {
+    Alert.alert(i18n.t("error"), i18n.t("photoRequired"));
+    return;
+  }
 
     const formData = {
       namaRestoran: namaRestoran.trim(),
@@ -351,7 +353,7 @@ const AddRestoran = () => {
         {hasActiveOperations && (
           <View style={styles.loadingIndicator}>
             <ActivityIndicator size="small" color="#911F1B" />
-            <Text style={styles.loadingText}>Saving restaurant...</Text>
+            <Text style={styles.loadingText}>{i18n.t("savingRestaurant")}</Text>
           </View>
         )}
         {errorItems.map(item => (
@@ -360,7 +362,7 @@ const AddRestoran = () => {
             style={styles.errorItem}
             onPress={() => retryFailedSave(item.id, {}, null)}
           >
-            <Text style={styles.errorText}>❌ {item.name} failed - Tap to retry</Text>
+            <Text style={styles.errorText}>❌ {item.name} {i18n.t("saveFailed")} - {i18n.t("tapToRetry")}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -396,9 +398,9 @@ const AddRestoran = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={require("../../assets/ic_left_arrow.png")} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.title}>New Restaurant</Text>
+        <Text style={styles.title}>{i18n.t("newRestaurant")}</Text>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Save</Text>
+          <Text style={styles.saveButtonText}>{i18n.t("save")}</Text>
         </TouchableOpacity>
       </View>
 
@@ -421,8 +423,8 @@ const AddRestoran = () => {
                 style={styles.placeholderIcon}
                 resizeMode="contain"
               />
-              <Text style={styles.placeholderText}>Tap to add photo</Text>
-              <Text style={styles.placeholderSubText}>Camera or Gallery</Text>
+              <Text style={styles.placeholderText}>{i18n.t("tapToAddPhoto")}</Text>
+              <Text style={styles.placeholderSubText}>{i18n.t("cameraOrGallery")}</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -431,21 +433,21 @@ const AddRestoran = () => {
       {/* Form Fields */}
       <TextInput 
         style={styles.input} 
-        placeholder="Restaurant Name" 
+        placeholder={i18n.t("dishName")} 
         value={namaRestoran} 
         onChangeText={setNamaRestoran}
         returnKeyType="next"
       />
       <TextInput 
         style={styles.input} 
-        placeholder="City/District" 
+        placeholder={i18n.t("cityDistrict")}
         value={kota} 
         onChangeText={setKota}
         returnKeyType="next"
       />
       <TextInput 
         style={styles.input} 
-        placeholder="Address" 
+        placeholder={i18n.t("address")} 
         value={alamat} 
         onChangeText={setAlamat}
         returnKeyType="next"
@@ -454,14 +456,14 @@ const AddRestoran = () => {
       />
       <TextInput 
         style={styles.input} 
-        placeholder="Opening Hours (e.g., 09:00 - 22:00)" 
+        placeholder={i18n.t("openingHoursHint")} 
         value={jamBuka}
         onChangeText={setJamBuka}
         returnKeyType="next"
       />
       <TextInput 
         style={styles.input} 
-        placeholder="Phone Number" 
+        placeholder={i18n.t("phoneNumber")} 
         keyboardType="phone-pad" 
         value={noTelp} 
         onChangeText={setNoTelp}
@@ -469,8 +471,8 @@ const AddRestoran = () => {
       />
 
       {/* Detail Section */}
-      <Text style={styles.sectionTitle}>Place Details</Text>
-      <Text style={styles.sectionSub}>Provide location details below</Text>
+      <Text style={styles.sectionTitle}>{i18n.t("placeDetails")}</Text>
+      <Text style={styles.sectionSub}>{i18n.t("provideLocation")}</Text>
 
       {/* Location Picker */}
       <View style={styles.mapPreview}>
@@ -497,14 +499,14 @@ const AddRestoran = () => {
               source={require("../../assets/ic_location.png")}
               style={styles.placeholderImage}
             />
-            <Text style={styles.mapPlaceholderText}>Tap to select location</Text>
+            <Text style={styles.mapPlaceholderText}>{i18n.t("tapToSelectLocation")}</Text>
           </TouchableOpacity>
         )}
       </View>
       
       {pickedLocation && (
         <TouchableOpacity style={styles.editLocationButton} onPress={handlePickLocation}>
-          <Text style={styles.editLocationText}>Change Location</Text>
+          <Text style={styles.editLocationText}>{i18n.t("changeLocation")}</Text>
         </TouchableOpacity>
       )}
       
