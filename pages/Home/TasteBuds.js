@@ -115,7 +115,7 @@ const TasteBuds = ({ navigation }) => {
       <HeaderBar
         searchValue={search}
         onChangeSearch={handleSearch}
-        onPressProfile={() => navigation.navigate('Profile')}
+        onPressProfile={() => navigation.navigate('DetailProfile')}
         onPressLanguage={() => setShowLangModal(true)} 
       />
       <View style={styles.scrollWrapper}>

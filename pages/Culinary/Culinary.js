@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_BASE_URL } from '../../api';
-
+import HeaderBar from "../Home/HeaderBar";
 
 const { width } = Dimensions.get("window");
 

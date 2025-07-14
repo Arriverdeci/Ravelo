@@ -13,31 +13,31 @@ import i18n from "../i18n";
 
 const { width, height } = Dimensions.get("window");
 
-const slides = [
-  {
-    id: '1',
-    title: i18n.t("onboarding1Title"),
-    description: i18n.t("onboarding1Desc"),
-    image: require('../../assets/OnBoarding/onboarding1.png'),
-  },
-  {
-    id: '2',
-    title: i18n.t("onboarding2Title"),
-    description: i18n.t("onboarding2Desc"),
-    image: require('../../assets/OnBoarding/onboarding2.png'),
-  },
-  {
-    id: '3',
-    title: i18n.t("onboarding3Title"),
-    description: i18n.t("onboarding3Desc"),
-    image: require('../../assets/OnBoarding/onboarding3.png'),
-  },
-];
-
 const OnboardingScreen = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigation = useNavigation();
   const flatListRef = useRef(null);
+
+  const slides = [
+    {
+      id: '1',
+      title: i18n.t("onboarding1Title"),
+      description: i18n.t("onboarding1Desc"),
+      image: require('../../assets/OnBoarding/onboarding1.png'),
+    },
+    {
+      id: '2',
+      title: i18n.t("onboarding2Title"),
+      description: i18n.t("onboarding2Desc"),
+      image: require('../../assets/OnBoarding/onboarding2.png'),
+    },
+    {
+      id: '3',
+      title: i18n.t("onboarding3Title"),
+      description: i18n.t("onboarding3Desc"),
+      image: require('../../assets/OnBoarding/onboarding3.png'),
+    },
+  ];
 
   const handleScroll = (event) => {
     const slide = Math.round(event.nativeEvent.contentOffset.x / width);
