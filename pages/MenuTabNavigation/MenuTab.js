@@ -29,7 +29,6 @@ function HomeStack() {
       {/* <Stack.Screen name="TasteBuds" component={TasteBuds} /> */}
       <Stack.Screen name="DetailHiddenGems" component={DetailHiddenGems} />
       <Stack.Screen name="Add" component={Add} />
-      <Stack.Screen name="AddCulinary" component={AddCulinary} />
     </Stack.Navigator>
   );
 }

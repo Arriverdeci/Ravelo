@@ -482,8 +482,6 @@ const DetailHiddenGems = () => {
     { key: 'ratings', title: 'Ratings' },
   ]);
 
-  const [restaurant, setRestaurant] = useState(null);
-
   useEffect(() => {
     const fetchRestaurant = async () => {
       try {
