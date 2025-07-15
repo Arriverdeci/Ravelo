@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import axios from "axios";
+import { API_BASE_URL } from "../../api";
 
 const { width, height } = Dimensions.get("window");
 
@@ -39,7 +40,7 @@ const OTPVerification = ({ route, navigation }) => {
     }
 
     try {
-      await axios.post("http://10.1.50.74:8080/api/otp/verify", {
+      await axios.post(`${API_BASE_URL}/api/otp/verify`, {
         username,
         otp,
       });
@@ -53,7 +54,7 @@ const OTPVerification = ({ route, navigation }) => {
 
   const handleResendOtp = async () => {
     try {
-      const res = await axios.post("http://10.1.50.74:8080/api/otp/generate", { username });
+      const res = await axios.post(`${API_BASE_URL}/api/otp/generate`, { username });
       const { otp } = res.data;
       Alert.alert("OTP Resent", `Your new OTP is: ${otp}`);
       setTimeLeft(60);

@@ -110,6 +110,17 @@ const TasteBuds = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  const filterKulinerBySearch = () => {
+    if (!search.trim()) return kulinerList;
+    const keyword = search.toLowerCase();
+    return kulinerList.filter(item => 
+      item.namaMakanan?.toLowerCase().includes(keyword) ||
+      item.jenisMakanan?.toLowerCase().includes(keyword)
+    );
+  };
+
+  const filteredKuliner = filterKulinerBySearch().filter(item => (item.totalRating || 0) >= 4);
+
   return (
     <View style={styles.container}>
       <HeaderBar
@@ -127,7 +138,7 @@ const TasteBuds = ({ navigation }) => {
           </View>
         ) : (
           <FlatList
-            data={filteredList}
+            data={filteredKuliner}
             renderItem={renderTasteCard}
             keyExtractor={(item, index) => item.kulinerId?.toString() || index.toString()}
             numColumns={2}

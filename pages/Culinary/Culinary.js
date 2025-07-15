@@ -1,6 +1,7 @@
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import * as Location from 'expo-location';
 import {
   View,
   Text,
@@ -8,12 +9,14 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
   Dimensions,
   TextInput,
+  SafeAreaView 
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_BASE_URL } from '../../api';
+import i18n from '../i18n';
+
 
 
 const { width } = Dimensions.get("window");
@@ -22,18 +25,100 @@ const Culinary = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const [userLocation, setUserLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
+  const [hiddenGems, setHiddenGems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [tasteBuds, setTasteBuds] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [kulinerList, setKulinerList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     if (isFocused) {
-    getKulinerData();
+      getCurrentLocation();
+      getKulinerData();
     }
     fetchData();
   }, [isFocused]);
+
+  const getCurrentLocation = async () => {
+    try {
+      setLoading(true);
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setLocationError('Permission untuk akses lokasi ditolak');
+        getAllResto();
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      const { latitude, longitude } = location.coords;
+      setUserLocation({ latitude, longitude });
+      setLocationError(null);
+      getRestobyLoc(latitude, longitude);
+    } catch (error) {
+      console.error('Error getting location:', error);
+      setLocationError('Failed to get location: ' + error.message);
+      getAllResto();
+    }
+  };
+
+  const getRestobyLoc = async (latitude, longitude) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/resto/getByLocation`, { latitude, longitude });
+      const data = Array.isArray(response.data) ? response.data : response.data.data || [];
+      const processed = data.map((item, index) => ({
+        id: item.id || `restaurant_${index}`,
+        name: item.namaRestoran,
+        image_url: item.fotoRestoran?.startsWith('http') ? item.fotoRestoran : `${API_BASE_URL}${item.fotoRestoran}`,
+        distance: calculateDistance(latitude, longitude, item.latitude, item.longitude).toFixed(1),
+      }));
+      setHiddenGems(processed);
+    } catch (error) {
+      console.error('Error fetching location-based resto:', error);
+      getAllResto();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAllResto = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/resto/getAll`);
+      const data = response.data || [];
+      const processedData = data.map((item, index) => ({
+        id: item.id || `restaurant_${index}`,
+        name: item.namaRestoran,
+        address: item.alamat,
+        phone: item.nomorTelepon,
+        city: item.kota,
+        operatingHours: item.jamOperasional,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        status: item.status,
+        image_url: item.fotoRestoran || item.image_url
+          ? (item.fotoRestoran || item.image_url).startsWith('http') 
+            ? (item.fotoRestoran || item.image_url)
+            : `${API_BASE_URL}${item.fotoRestoran || item.image_url}`
+          : null,
+        distance: userLocation 
+          ? calculateDistance(
+              userLocation.latitude, 
+              userLocation.longitude, 
+              item.latitude || 0, 
+              item.longitude || 0
+            ).toFixed(1)
+          : (Math.random() * 10).toFixed(1)
+      }));
+      setHiddenGems(processedData);
+    } catch (error) {
+      console.error('Error fetching all resto:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -94,10 +179,12 @@ const Culinary = () => {
 
   const renderFavorite = ({ item }) => (
     <View style={styles.favoriteCard}>
-      <Image
-        source={{ uri: `${API_BASE_URL}${item.fotoMakanan}` }}
-        style={styles.favoriteImage}
-      />
+      <TouchableOpacity onPress={() => navigation.navigate('DetailCulinary', { kuliner: item })}>
+        <Image
+          source={{ uri: `${API_BASE_URL}${item.fotoMakanan}` }}
+          style={styles.favoriteImage}
+        />
+      </TouchableOpacity>
       <TouchableOpacity style={styles.heartIcon}>
         <Icon name="heart" size={16} color="red" />
       </TouchableOpacity>
@@ -114,141 +201,121 @@ const Culinary = () => {
     </View>
   );
 
-  const TasteCard = ({ image, rating, distance }) => {
-    return (
-      <View style={styles.tasteCardContainer}>
-        <View style={styles.tasteCardImageWrapper}>
-          <Image source={image} style={styles.tasteCardImage} />
-          <View style={styles.ratingBadge}>
-            <Text style={styles.ratingText}>{rating.toFixed(1)} ⭐</Text>
-          </View>
-          <View style={styles.distanceBadgeBottomRight}>
-            <Text style={styles.distanceText}>{distance} Km</Text>
-          </View>
-        </View>
-      </View>
+  const filterKulinerBySearch = () => {
+    if (!search.trim()) return kulinerList;
+    const keyword = search.toLowerCase();
+    return kulinerList.filter(item => 
+      item.namaMakanan?.toLowerCase().includes(keyword) ||
+      item.jenisMakanan?.toLowerCase().includes(keyword)
     );
   };
 
-  const filteredKulinerByCategory = kulinerList.filter(
-    item => item.kategori === selectedCategory
-  );
-
-  const filteredKulinerList = kulinerList.filter(
-    item => (item.totalRating || 0) >= 4
-  );
-
-
-  const renderTaste = ({ item }) => (
-    <View style={{ marginBottom: 16 }}>
-      <TasteCard
-        image={
-          item.fotoMakanan
-            ? { uri: `${API_BASE_URL}${item.fotoMakanan}` }
-            : require('../../assets/logo_ravelo.png')
-        }
-        rating={item.totalRating || 0}
-        distance={item.jarakKm?.toFixed(1) || '0.0'}
-      />
-    </View>
-  );
-
+  const filteredKuliner = filterKulinerBySearch()
+  .filter(item => (item.totalRating || 0) >= 4)
+  .sort((a, b) => (b.totalRating || 0) - (a.totalRating || 0))
+  .slice(0, 4);
 
 
   return (
-    <View style={styles.container}>
-      <HeaderBar
-        searchValue={search}
-        onChangeSearch={setSearch}
-        onPressProfile={() => navigation.navigate('DetailProfile')}
-      />
-
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <FlatList
         style={styles.scrollContent}
         ListHeaderComponent={
-          <View>
+          <View style={{ paddingHorizontal: 16, paddingTop: 16}}>
+            {/* Header */}
+            <Text style={styles.headerTitle}>{i18n.t('culinaryTitle')}</Text>
 
-            {/* 🔍 Search Result or My Favorites */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>My Favorites</Text>
-                <TouchableOpacity style={styles.viewAll}>
-                  <Text style={styles.viewAllText}>View All</Text>
-                  <Image
-                    source={require("../../assets/ic_right_arrow.png")}
-                    style={styles.arrowIcon}
-                  />
+            {/* Search Bar */}
+            <View style={styles.searchBar}>
+              <Icon name="search" size={16} color="#888" style={{ marginRight: 8 }} />
+              <TextInput 
+                placeholder={i18n.t('searchPlaceholder')} 
+                style={{ flex: 1 }} 
+                value={search}
+                onChangeText={setSearch}
+              />
+              {search.length > 0 && (
+                <TouchableOpacity onPress={() => setSearch('')}>
+                  <Icon name="times" size={16} color="#888" style={{ marginLeft: 8 }} />
                 </TouchableOpacity>
+              )}
+            </View>
+
+            {/* My Favorites */}
+            <View>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>{i18n.t('myFav')}</Text>
+                  <TouchableOpacity style={styles.viewAll}>
+                    <Text 
+                      style={styles.seeAll}
+                      onPress={() => navigation.navigate('MyFavorites')}>{i18n.t('viewAll')}
+                    </Text>
+                  </TouchableOpacity>
+              </View>
+              
+              <FlatList
+                data={filterKulinerBySearch().slice(0, 4)}
+                renderItem={renderFavorite}
+                keyExtractor={(item) => item.kulinerId.toString()}
+                numColumns={2}
+                scrollEnabled={false}
+                columnWrapperStyle={{ justifyContent: 'space-between' }}
+              />
+            </View>
+            
+            {/* For Your Taste Buds */}
+            <View>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>{i18n.t('forYou')}</Text>
+                  <TouchableOpacity style={styles.viewAll}>
+                    <Text 
+                      style={styles.seeAll}
+                      onPress={() => navigation.navigate('TasteBuds')}>{i18n.t('viewAll')}
+                    </Text>
+                  </TouchableOpacity>
               </View>
 
-              {/* Dummy Favorites list bisa pake FlatList horizontal */}
               <FlatList
-                horizontal
-                data={favoriteList} // ganti ini sesuai state
-                keyExtractor={(item, index) => `fav_${index}`}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 16 }}
+                data={filteredKuliner}
+                keyExtractor={(item, index) => item.kulinerId?.toString() || `kuliner_${index}`}
+                numColumns={2}
+                columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 4 }}
+                contentContainerStyle={{ paddingBottom: 20 }}
                 renderItem={({ item }) => (
-                  <TouchableOpacity>
-                    {/* Bisa pake komponen FavoriteCard */}
-                    <View style={{ width: 100, height: 100, backgroundColor: '#eee', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
-                      <Text>{item.namaMakanan || 'Fav'}</Text>
+                  <TouchableOpacity onPress={() => navigation.navigate('DetailCulinary', { kuliner: item })}>
+                    <View style={styles.tasteCardContainer}>
+                      <View style={styles.tasteCardImageWrapper}>
+                        <Image
+                          source={
+                            item.fotoMakanan
+                              ? { uri: `${API_BASE_URL}${item.fotoMakanan}` }
+                              : require("../../assets/logo_ravelo.png")
+                          }
+                          style={styles.tasteCardImage}
+                        />
+                        <View style={styles.ratingBadge}>
+                          <Text style={styles.ratingText}>{(item.totalRating || 0).toFixed(1)} ⭐</Text>
+                        </View>
+                        <View style={styles.distanceBadgeBottomRight}>
+                          <Text style={styles.distanceText}>{item.jarakKm?.toFixed(1) || '0.0'} Km</Text>
+                        </View>
+                      </View>
                     </View>
                   </TouchableOpacity>
                 )}
+                ListEmptyComponent={() => (
+                  <Text style={{ textAlign: 'center', marginTop: 20, color: '#888' }}>
+                    Tidak ada hasil ditemukan.
+                  </Text>
+                )}
               />
             </View>
-
-            {/* 🍴 For Your Taste Buds */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>For Your Taste Buds</Text>
-                <TouchableOpacity style={styles.viewAll}>
-                  <Text style={styles.viewAllText}>View All</Text>
-                  <Image
-                    source={require("../../assets/ic_right_arrow.png")}
-                    style={styles.arrowIcon}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-
           </View>
         }
-
-        data={kulinerList.filter(item => (item.totalRating || 0) >= 4)}
-        keyExtractor={(item, index) => item.kulinerId?.toString() || `kuliner_${index}`}
-        numColumns={2}
-        columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 16 }}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => navigation.navigate('DetailHiddenGems', { restoranId: item.restoranId })}>
-            <View style={styles.tasteCardContainer}>
-              <View style={styles.tasteCardImageWrapper}>
-                <Image
-                  source={
-                    item.fotoMakanan
-                      ? { uri: `${API_BASE_URL}${item.fotoMakanan}` }
-                      : require("../../assets/logo_ravelo.png")
-                  }
-                  style={styles.tasteCardImage}
-                />
-                <View style={styles.ratingBadge}>
-                  <Text style={styles.ratingText}>{(item.totalRating || 0).toFixed(1)} ⭐</Text>
-                </View>
-                <View style={styles.distanceBadgeBottomRight}>
-                  <Text style={styles.distanceText}>{item.jarakKm?.toFixed(1) || '0.0'} Km</Text>
-                </View>
-              </View>
-              <Text style={styles.tasteCardTitle} numberOfLines={1}>{item.namaMakanan}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
       />
-    </View>
+    </SafeAreaView>
   );
 };
-
 export default Culinary;
 
 const styles = StyleSheet.create({
@@ -341,7 +408,9 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   tasteCardContainer: {
-    width: (width - 48) / 2, 
+    width: (width - 48) / 2,
+    marginBottom: 8,
+    marginTop: 8,
   },
   tasteCardImageWrapper: {
     width: "100%",

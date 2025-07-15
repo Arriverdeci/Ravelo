@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import axios from "axios";
+import { API_BASE_URL } from "../../api";
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,7 +25,7 @@ const ForgotPassword = ({ navigation }) => {
     }
 
     try {
-      const res = await axios.post("http://10.1.50.74:8080/api/otp/generate", { username });
+      const res = await axios.post(`${API_BASE_URL}/api/otp/generate`, { username });
       const { otp } = res.data;
 
       Alert.alert("OTP Sent", `Your OTP is: ${otp}`);

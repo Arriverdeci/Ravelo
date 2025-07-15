@@ -6,6 +6,7 @@ const id = {
   searchPlaceholder: "Cari Makanan/Restoran",
   hiddenGems: "Rekomendasi Tersembunyi",
   viewAll: "Lihat Semua",
+  myFav: "Favorit saya",
   forYou: "Untuk Selera Anda",
   back: "← Kembali",
   retryText: "Coba lagi",
@@ -40,6 +41,11 @@ const id = {
   uploadingReview: "Mengunggah ulasan...",
   reviewFailed: "gagal - Ketuk untuk ulang",
   wantAddMenu: "Ingin menambahkan menu baru?",
+
+  // culinary
+  culinaryTitle : "Kuliner",
+  searchPlaceholderCulinary: "Cari kuliner",
+
 
   // add kuliner
   addMenuTitle: "Menu Baru",
@@ -109,6 +115,7 @@ const en = {
   searchPlaceholder: "Search Food/Restaurant",
   hiddenGems: "Hidden Gems",
   viewAll: "View All",
+  myFav: "My Favorites",
   forYou: "For Your Taste Buds",
   back: "← Back",
   retryText: "Try again",
@@ -143,6 +150,10 @@ const en = {
   uploadingReview: "Uploading review...",
   reviewFailed: "failed - Tap to retry",
   wantAddMenu: "Wanna add new menu?",
+
+  // culinary
+  culinaryTitle: "Culinary",
+  searchPlaceholderCulinary: "Search culinary",
 
   // add kuliner
   addMenuTitle: "New Menu",

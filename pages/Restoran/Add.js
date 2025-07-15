@@ -14,7 +14,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  SafeAreaView
 } from "react-native";
 import i18n from '../i18n';
 
@@ -349,6 +350,7 @@ const AddRestoran = () => {
     const errorItems = saveQueue.filter(item => item.status === 'error');
 
     return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.saveQueueContainer}>
         {hasActiveOperations && (
           <View style={styles.loadingIndicator}>
@@ -366,6 +368,7 @@ const AddRestoran = () => {
           </TouchableOpacity>
         ))}
       </View>
+      </SafeAreaView>
     );
   };
 
@@ -389,6 +392,7 @@ const AddRestoran = () => {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
     <ScrollView 
       contentContainerStyle={styles.container}
       keyboardShouldPersistTaps="handled" 
@@ -433,7 +437,7 @@ const AddRestoran = () => {
       {/* Form Fields */}
       <TextInput 
         style={styles.input} 
-        placeholder={i18n.t("dishName")} 
+        placeholder={i18n.t("restaurantName")} 
         value={namaRestoran} 
         onChangeText={setNamaRestoran}
         returnKeyType="next"
@@ -512,6 +516,7 @@ const AddRestoran = () => {
       
       <View style={{ height: 50 }} />
     </ScrollView>
+    </SafeAreaView>
   );
 };
 

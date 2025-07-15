@@ -11,6 +11,7 @@ import {
   Dimensions,
 } from "react-native";
 import axios from "axios";
+import { API_BASE_URL } from "../../api";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,7 +32,7 @@ const ResetPassword = ({ route, navigation }) => {
     }
 
     try {
-      await axios.post("http://10.1.50.74:8080/api/otp/reset", {
+      await axios.post(`${API_BASE_URL}/api/otp/reset`, {
         username,
         newPassword,
       });
