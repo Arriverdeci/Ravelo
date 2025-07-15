@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 import MapView, { Marker } from "react-native-maps";
-import { API_BASE_URL } from '../../api'
+import { API_BASE_URL } from '../../api';
 import * as FileSystem from 'expo-file-system';
 import HomePage from "../Home/HomePage";
 import {

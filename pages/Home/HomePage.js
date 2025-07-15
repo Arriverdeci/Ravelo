@@ -40,6 +40,11 @@ const HomePage = () => {
     }
   }, [isFocused]);
 
+  const filteredSearchKuliner = kulinerList.filter(item =>
+    item.namaMakanan?.toLowerCase().includes(search.toLowerCase()) ||
+    item.namaRestoran?.toLowerCase().includes(search.toLowerCase())
+  );
+
   const getCurrentLocation = async () => {
     try {
       setLoading(true);
@@ -260,14 +265,18 @@ const HomePage = () => {
               <View style={styles.categoryUnderline} />
             </View>
 
-            {selectedCategory !== "" ? (
+            {/* Back and title when filter category is active */}
+            {selectedCategory !== "" && (
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>{translateCategory(selectedCategory)}</Text>
                 <TouchableOpacity onPress={() => setSelectedCategory("")}>
                   <Text style={styles.viewAllText}>{i18n.t('back')}</Text>
                 </TouchableOpacity>
               </View>
-            ) : (
+            )}
+            
+            {/* Show hidden gems + promo + for you if no search and no filter */}
+            {selectedCategory === "" && search.trim() === "" && (
               <View>
                 {/* Hidden Gems Section */}
                 <View style={styles.section}>
@@ -308,7 +317,7 @@ const HomePage = () => {
                         <TouchableOpacity onPress={() => { navigation.navigate('DetailHiddenGems', { restoranId: item.id })}}>
                           <HiddenGemsCard
                             imageSource={
-                              item.image_url 
+                              item.image_url && item.image_url !== 'null'
                                 ? { uri: item.image_url }
                                 : require("../../assets/logo_ravelo.png")
                             }
@@ -360,14 +369,16 @@ const HomePage = () => {
                   </View>
                 </View>
 
-                {/* For Your Taste Buds Header */}
+                {/* For Your Taste Buds */}
                 <View style={styles.section}>
                   <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>{i18n.t('forYou')}</Text>
                     <TouchableOpacity style={styles.viewAll}>
                       <Text 
                         style={styles.viewAllText}
-                        onPress={() => navigation.navigate('TasteBuds')}>{i18n.t('viewAll')}</Text>
+                        onPress={() => navigation.navigate('TasteBuds')}>
+                        {i18n.t('viewAll')}
+                      </Text>
                       <Image
                         source={require("../../assets/ic_right_arrow.png")}
                         style={styles.arrowIcon}
@@ -379,7 +390,13 @@ const HomePage = () => {
             )}
           </View>
         }
-        data={selectedCategory !== "" ? filteredKulinerByCategory : filteredKulinerList}
+        data={
+          selectedCategory !== ""
+            ? filteredKulinerByCategory
+            : search.trim() !== ""
+            ? filteredSearchKuliner
+            : filteredKulinerList
+        }
         keyExtractor={(item, index) => item.kulinerId?.toString() || `kuliner_${index}`}
         numColumns={2}
         columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 16 }}

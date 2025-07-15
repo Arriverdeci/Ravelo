@@ -36,6 +36,7 @@ const SignUp = ({ navigation }) => {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/users/register`, {
+      const response = await axios.post(`${API_BASE_URL}/api/users/register`, {
         firstName,
         lastName,
         username,

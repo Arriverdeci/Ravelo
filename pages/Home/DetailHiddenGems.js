@@ -543,7 +543,7 @@ const DetailHiddenGems = () => {
       <HeaderBar
         searchValue=""
         onChangeSearch={() => {}}
-        onPressProfile={() => navigation.navigate('Profile')}
+        onPressProfile={() => navigation.navigate('DetailProfile')}
         onPressLanguage={() => setShowLangModal(true)} 
       />
 

@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { API_BASE_URL } from '../../api';
 
 const DetailProfile = () => {
   const navigation = useNavigation();
@@ -22,7 +23,7 @@ const DetailProfile = () => {
         // Ambil username dari AsyncStorage (pastikan key-nya benar, misalnya 'username')
         const storedUsername = await AsyncStorage.getItem('username'); // bukan 'Users'!
         if (storedUsername) {
-          const res = await axios.get(`http://10.1.50.225:8080/api/users/${storedUsername}/profile`);
+          const res = await axios.get(`${API_BASE_URL}/api/users/${storedUsername}/profile`);
           console.log('User fetched:', res.data); // Debug
           setUser(res.data);
         } else {
@@ -105,8 +106,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontFamily: 'PoppinsMedium',
     color: '#000000',
     marginLeft: 10,
   },
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
   editPhotoText: {
     color: '#911F1B',
     fontSize: 14,
-    fontWeight: '500',
+    fontFamily: 'PoppinsMedium',
   },
   section: {
     paddingVertical: 15,
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     color: '#000000',
-    fontWeight: '500',
+    fontFamily: 'PoppinsRegular',
   },
   addText: {
     fontSize: 16,
