@@ -5,10 +5,11 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Image,
   Dimensions,
   ScrollView,
+  Modal,
+  Animated,
 } from "react-native";
 import axios from "axios";
 
@@ -19,6 +20,38 @@ const OTPVerification = ({ route, navigation }) => {
   const [otp, setOtp] = useState("");
   const [timeLeft, setTimeLeft] = useState(60);
   const [canResend, setCanResend] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalAnim] = useState(new Animated.Value(0));
+
+  const showModal = (title, message, callback) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalVisible(true);
+    Animated.spring(modalAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start(() => {
+      if (callback) {
+        setTimeout(() => {
+          callback();
+          hideModal();
+        }, 2000);
+      }
+    });
+  };
+
+  const hideModal = () => {
+    Animated.timing(modalAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      setModalVisible(false);
+    });
+  };
 
   useEffect(() => {
     let interval = null;
@@ -34,32 +67,42 @@ const OTPVerification = ({ route, navigation }) => {
 
   const handleVerifyOtp = async () => {
     if (!otp) {
-      Alert.alert("Error", "OTP is required");
+      showModal("Error", "OTP is required");
       return;
     }
 
     try {
-      await axios.post("http://10.1.50.74:8080/api/otp/verify", {
+      await axios.post("http://10.94.66.133:8080/api/otp/verify", {
         username,
         otp,
       });
 
-      Alert.alert("Success", "OTP Verified");
-      navigation.navigate("ResetPassword", { username });
+      showModal("Success", "OTP Verified", () =>
+        navigation.navigate("ResetPassword", { username })
+      );
     } catch (error) {
-      Alert.alert("Error", error?.response?.data?.message || "Invalid or expired OTP");
+      showModal(
+        "Error",
+        error?.response?.data?.message || "Invalid or expired OTP"
+      );
     }
   };
 
   const handleResendOtp = async () => {
     try {
-      const res = await axios.post("http://10.1.50.74:8080/api/otp/generate", { username });
+      const res = await axios.post(
+        "http://10.94.66.133:8080/api/otp/generate",
+        { username }
+      );
       const { otp } = res.data;
-      Alert.alert("OTP Resent", `Your new OTP is: ${otp}`);
+      showModal("OTP Resent", `Your new OTP is: ${otp}`);
       setTimeLeft(60);
       setCanResend(false);
     } catch (error) {
-      Alert.alert("Error", error?.response?.data?.message || "Failed to resend OTP");
+      showModal(
+        "Error",
+        error?.response?.data?.message || "Failed to resend OTP"
+      );
     }
   };
 
@@ -73,7 +116,8 @@ const OTPVerification = ({ route, navigation }) => {
         />
         <Text style={styles.title}>OTP Verification</Text>
         <Text style={styles.subtitle}>
-          We've sent a 4-digit code to your account. Please enter it below to continue resetting your password.
+          We've sent a 4-digit code to your account. Please enter it below to
+          continue resetting your password.
         </Text>
       </View>
 
@@ -95,7 +139,9 @@ const OTPVerification = ({ route, navigation }) => {
               <Text style={styles.resendText}>Resend Code</Text>
             </TouchableOpacity>
           ) : (
-            <Text style={styles.timerText}>Resend code in {timeLeft} seconds</Text>
+            <Text style={styles.timerText}>
+              Resend code in {timeLeft} seconds
+            </Text>
           )}
         </View>
 
@@ -103,6 +149,37 @@ const OTPVerification = ({ route, navigation }) => {
           <Text style={styles.buttonText}>Verify OTP</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Modal */}
+      <Modal visible={modalVisible} transparent animationType="none">
+        <View style={styles.modalOverlay}>
+          <Animated.View
+            style={[
+              styles.modalContainer,
+              {
+                transform: [
+                  { scale: modalAnim },
+                  {
+                    translateY: modalAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [50, 0],
+                    }),
+                  },
+                ],
+                opacity: modalAnim,
+              },
+            ]}
+          >
+            <Text style={styles.modalTitle}>{modalTitle}</Text>
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            {!modalTitle.includes("Success") && (
+              <TouchableOpacity style={styles.modalButton} onPress={hideModal}>
+                <Text style={styles.modalButtonText}>OK</Text>
+              </TouchableOpacity>
+            )}
+          </Animated.View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -188,6 +265,49 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
+    color: "#fff",
+    fontFamily: "PoppinsBold",
+    fontSize: 16,
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 24,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "PoppinsBold",
+    marginBottom: 12,
+    color: "#000",
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+    fontFamily: "PoppinsRegular",
+  },
+  modalButton: {
+    backgroundColor: "#911F1B",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  modalButtonText: {
     color: "#fff",
     fontFamily: "PoppinsBold",
     fontSize: 16,
