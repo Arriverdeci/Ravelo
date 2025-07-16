@@ -8,20 +8,22 @@ import {
   Image,
   Alert,
   SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Icon from 'react-native-vector-icons/Feather';
+import { API_BASE_URL } from '../../api';
+import i18n from '../i18n';
 
 const CreatePost = ({ navigation }) => {
   const [postText, setPostText] = useState('');
-  const [imageUri, setImageUri] = useState(null);
   const [images, setImages] = useState([]);
 
   const handleOpenPicker = () => {
-    Alert.alert('Pilih Gambar', 'Ambil gambar dari mana?', [
-      { text: 'Kamera', onPress: handlePickFromCamera },
-      { text: 'Galeri', onPress: handlePickFromGallery },
-      { text: 'Batal', style: 'cancel' },
+    Alert.alert(`${i18n.t('chooseImage')}`, `${i18n.t('chooseImageQuestion')}`, [
+      { text: `${i18n.t('buttonCamera')}`, onPress: handlePickFromCamera },
+      { text: `${i18n.t('buttonGallery')}`, onPress: handlePickFromGallery },
+      { text: `${i18n.t('buttonCancel')}`, style: 'cancel' },
     ]);
   };
 
@@ -34,13 +36,14 @@ const CreatePost = ({ navigation }) => {
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
+      allowsMultipleSelection: true,
       quality: 1,
+      selectionLimit: 5,
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      const newImages = result.assets.map((asset) => asset.uri);
+      setImages((prevImages) => [...prevImages, ...newImages]);
     }
   };
 
@@ -53,14 +56,84 @@ const CreatePost = ({ navigation }) => {
 
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      setImages((prevImages) => [...prevImages, result.assets[0].uri]);
     }
   };
+
+  const removeImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+    const handleSubmit = async () => {
+        if (!postText && images.length === 0) {
+            alert(`${i18n.t('emptyAlert')}`);
+            return;
+        }
+
+        try {
+            let imageUrls = [];
+
+          
+            if (images.length > 0) {
+            const formData = new FormData();
+            images.forEach((uri, index) => {
+                const filename = uri.split('/').pop();
+                const match = /\.(\w+)$/.exec(filename);
+                const type = match ? `image/${match[1]}` : `image`;
+
+                formData.append('images', {
+                uri,
+                name: filename || `image${index}.jpg`,
+                type,
+                });
+            });
+
+            const uploadResponse = await fetch(`${API_BASE_URL}/community/upload`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            const uploadResult = await uploadResponse.json();
+            if (!Array.isArray(uploadResult)) {
+                throw new Error('Upload gagal atau format respons salah');
+            }
+
+            imageUrls = uploadResult.map(item => item.url);
+            }
+
+            const postData = {
+            userId: 1,
+            content: postText,
+            imageUrls: imageUrls,
+            };
+
+            const postResponse = await fetch(`${API_BASE_URL}/community/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData),
+            });
+
+            const postResult = await postResponse.json();
+            if (postResult.status === 200) {
+              navigation.navigate('CommunityTab');
+            }
+            else {
+              alert('Gagal: ' + postResult.message);
+            }
+
+        } catch (error) {
+            console.error('Submit error:', error);
+            alert('Terjadi kesalahan saat membuat post');
+        }
+    };
+
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -70,9 +143,9 @@ const CreatePost = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Icon name="arrow-left" size={24} color="#000" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Postingan</Text>
-          <TouchableOpacity>
-            <Text style={styles.sendButton}>Send</Text>
+          <Text style={styles.headerTitle}>{i18n.t('postTitle')}</Text>
+          <TouchableOpacity onPress={handleSubmit}>
+            <Text style={styles.sendButton}>{i18n.t('buttonSend')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -84,7 +157,7 @@ const CreatePost = ({ navigation }) => {
           />
           <TextInput
             style={styles.input}
-            placeholder="Write something..."
+            placeholder={i18n.t('postPlaceHolder')}
             value={postText}
             onChangeText={setPostText}
             multiline
@@ -96,9 +169,14 @@ const CreatePost = ({ navigation }) => {
           <TouchableOpacity style={styles.cameraButton} onPress={handleOpenPicker}>
             <Icon name="camera" size={24} color="#E95322" />
           </TouchableOpacity>
-          {imageUri && (
-            <Image source={{ uri: imageUri }} style={styles.foodImage} />
-          )}
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {images.map((uri, index) => (
+              <TouchableOpacity key={index} onPress={() => removeImage(index)}>
+                <Image source={{ uri }} style={styles.foodImage} />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
       </View>
     </SafeAreaView>
@@ -164,8 +242,9 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   foodImage: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
     borderRadius: 12,
+    marginRight: 10,
   },
 });

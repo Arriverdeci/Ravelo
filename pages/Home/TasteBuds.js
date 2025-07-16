@@ -94,7 +94,7 @@ const TasteBuds = ({ navigation }) => {
     <TouchableOpacity
       style={{ flex: 1, margin: 6 }}
       onPress={() =>
-        navigation.navigate('DetailHiddenGems', { restoranId: item.restoranId })
+        navigation.navigate('DetailCulinary', { kuliner: item })
       }
     >
       <TasteCard
@@ -146,7 +146,6 @@ const TasteBuds = ({ navigation }) => {
             showsVerticalScrollIndicator={false}
           />
         )}
-
             {showLangModal && (
               <View style={styles.modalOverlay}>
                 <View style={styles.modalBox}>

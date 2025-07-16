@@ -192,7 +192,6 @@ const AddCulinary = () => {
       screen: "DetailHiddenGems",
       params: {restoranId: restoranId}
     });
-
   };
 
   const renderSaveQueue = () => {

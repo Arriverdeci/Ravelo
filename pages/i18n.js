@@ -46,6 +46,22 @@ const id = {
   culinaryTitle : "Kuliner",
   searchPlaceholderCulinary: "Cari kuliner",
 
+  // community
+  communityTitle: "Komunitas",
+  postTitle: "Postingan",
+  postPlaceHolder: "Tuliskan sesuatu",
+  buttonSend: "Kirim",
+  buttonCancel: "Batal",
+  buttonCamera: "Kamera",
+  buttonGallery: "Galeri",
+  chooseImage: "Pilih Gambar",
+  chooseImageQuestion: "ambil gambar dari mana?",
+  justNow: "Baru saja",
+  seconds: "detik yang lalu",
+  minutes: "menit yang lalu",
+  hours: "jam yang lalu",
+  days: "hari yang lalu",
+  emptyAlert: "Isi postingan atau pilih gambar dulu",
 
   // add kuliner
   addMenuTitle: "Menu Baru",
@@ -154,6 +170,24 @@ const en = {
   // culinary
   culinaryTitle: "Culinary",
   searchPlaceholderCulinary: "Search culinary",
+
+  // community
+  communityTitle: "Community",
+  postTitle: "Post",
+  postPlaceHolder: "Write something",
+  buttonSend: "Send",
+  buttonCancel: "Cancel",
+  buttonCamera: "Camera",
+  buttonGallery: "Gallery",
+  chooseImage: "Choose Image",
+  chooseImageQuestion: "choose image from?",
+  justNow: "Just now",
+  seconds: "seconds ago",
+  minutes: "minutes ago",
+  hours: "hours ago",
+  days: "days ago",
+  emptyAlert: "Fill in the post or choose a picture first",
+  
 
   // add kuliner
   addMenuTitle: "New Menu",
