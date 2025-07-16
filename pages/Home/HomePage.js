@@ -226,6 +226,7 @@ const HomePage = () => {
         onChangeSearch={setSearch}
         onPressProfile={() => navigation.navigate('DetailProfile')}
         onPressLanguage={() => setShowLangModal(true)} 
+        onPressNotif={() => navigation.navigate('Notification')} // Tambahkan ini
       />
       <FlatList
         style={styles.scrollContent}

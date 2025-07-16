@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   View,
@@ -6,6 +5,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Text,
 } from 'react-native';
 import i18n from '../i18n';
 
@@ -15,6 +15,7 @@ const HeaderBar = ({
   onPressProfile,
   onPressNotif,
   onPressLanguage,
+  unreadCount = 0, // badge count
 }) => {
   return (
     <View style={styles.wrapper}>
@@ -37,6 +38,13 @@ const HeaderBar = ({
             source={require('../../assets/ic_notif.png')}
             style={styles.notifIcon}
           />
+          {unreadCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -96,11 +104,31 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
   notifIcon: {
     width: 20,
     height: 20,
     tintColor: 'white',
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#E6020B',
+  },
+  badgeText: {
+    color: '#E6020B',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   searchFilter: {
     flexDirection: 'row',
@@ -116,7 +144,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    fontFamily: 'PoppinsRegular',
     marginRight: 10,
   },
   searchIcon: {

@@ -7,8 +7,9 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
-  Alert,
   ScrollView,
+  Modal,
+  Animated,
 } from "react-native";
 import axios from "axios";
 import { API_BASE_URL } from "../../api";
@@ -23,19 +24,49 @@ const SignUp = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalAnim] = useState(new Animated.Value(0));
+
+  const showModal = (title, message, callback = null) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalVisible(true);
+    Animated.spring(modalAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start(() => {
+      if (callback) {
+        setTimeout(() => {
+          callback();
+          hideModal();
+        }, 1500);
+      }
+    });
+  };
+
+  const hideModal = () => {
+    Animated.timing(modalAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => setModalVisible(false));
+  };
+
   const handleSignUp = async () => {
     if (!firstName || !lastName || !username || !phoneNumber || !password || !confirmPassword) {
-      Alert.alert("Error", "All fields are required!");
+      showModal("Error", "All fields are required!");
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Password and Confirm Password do not match.");
+      showModal("Error", "Password and Confirm Password do not match.");
       return;
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/users/register`, {
+      await axios.post(`${API_BASE_URL}/api/users/register`, {
         firstName,
         lastName,
         username,
@@ -44,11 +75,11 @@ const SignUp = ({ navigation }) => {
         confirmPassword,
       });
 
-      navigation.navigate("NSignUp");
+
+        navigation.replace("NSignUp");
     } catch (error) {
-      console.log(error);
       const msg = error?.response?.data || "Registration failed.";
-      Alert.alert("Error", msg);
+      showModal("Error", msg);
     }
   };
 
@@ -60,64 +91,24 @@ const SignUp = ({ navigation }) => {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Join Ravelo and start your taste adventure!  Get early access to top culinary spots, AR Maps, and a vibrant food community.</Text>
+        <Text style={styles.title}>
+          Join Ravelo and start your taste adventure! Get early access to top culinary spots, AR Maps, and a vibrant food community.
+        </Text>
       </View>
 
       <View style={styles.content}>
         <Text style={styles.sectionTitle}>Create New Account</Text>
 
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="First Name"
-            placeholderTextColor="#999"
-            value={firstName}
-            onChangeText={setFirstName}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Last Name"
-            placeholderTextColor="#999"
-            value={lastName}
-            onChangeText={setLastName}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            placeholderTextColor="#999"
-            value={username}
-            onChangeText={setUsername}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Mobile Number"
-            placeholderTextColor="#999"
-            keyboardType="phone-pad"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#999"
-            secureTextEntry={true}
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            placeholderTextColor="#999"
-            secureTextEntry={true}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
+          <TextInput style={styles.input} placeholder="First Name" placeholderTextColor="#999" value={firstName} onChangeText={setFirstName} />
+          <TextInput style={styles.input} placeholder="Last Name" placeholderTextColor="#999" value={lastName} onChangeText={setLastName} />
+          <TextInput style={styles.input} placeholder="Username" placeholderTextColor="#999" value={username} onChangeText={setUsername} />
+          <TextInput style={styles.input} placeholder="Mobile Number" placeholderTextColor="#999" keyboardType="phone-pad" value={phoneNumber} onChangeText={setPhoneNumber} />
+          <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#999" secureTextEntry value={password} onChangeText={setPassword} />
+          <TextInput style={styles.input} placeholder="Confirm Password" placeholderTextColor="#999" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} />
         </View>
 
-        <TouchableOpacity
-          style={styles.loginTextContainer}
-          onPress={() => navigation.navigate("SignIn")}
-        >
+        <TouchableOpacity style={styles.loginTextContainer} onPress={() => navigation.navigate("SignIn")}>
           <Text style={styles.loginText}>Already have an account? Sign In</Text>
         </TouchableOpacity>
 
@@ -125,6 +116,37 @@ const SignUp = ({ navigation }) => {
           <Text style={styles.signUpButtonText}>SIGN UP</Text>
         </TouchableOpacity>
       </View>
+
+      {/* MODAL */}
+      <Modal visible={modalVisible} transparent animationType="none">
+        <View style={styles.modalOverlay}>
+          <Animated.View
+            style={[
+              styles.modalContainer,
+              {
+                transform: [
+                  { scale: modalAnim },
+                  {
+                    translateY: modalAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [50, 0],
+                    }),
+                  },
+                ],
+                opacity: modalAnim,
+              },
+            ]}
+          >
+            <Text style={styles.modalTitle}>{modalTitle}</Text>
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            {!modalTitle.includes("Success") && (
+              <TouchableOpacity style={styles.modalButton} onPress={hideModal}>
+                <Text style={styles.modalButtonText}>OK</Text>
+              </TouchableOpacity>
+            )}
+          </Animated.View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -153,17 +175,7 @@ const styles = StyleSheet.create({
     fontFamily: "PoppinsRegular",
     marginTop: 1,
     marginBottom: 20,
-    marginLeft: 10,
-    marginRight: 10,
-    lineHeight: 22,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: "#FFFFFF",
-    textAlign: "center",
-    fontFamily: "PoppinsRegular",
-    marginTop: 8,
-    marginBottom: 24,
+    marginHorizontal: 10,
     lineHeight: 22,
   },
   content: {
@@ -174,7 +186,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    color: "#E6020B",
+    color: "#911F1B",
     fontFamily: "PoppinsBold",
     marginBottom: 24,
     textAlign: "center",
@@ -198,17 +210,55 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   loginText: {
-    color: "#E6020B",
+    color: "#911F1B",
     fontFamily: "PoppinsMedium",
     fontSize: 14,
   },
   signUpButton: {
-    backgroundColor: "#E6020B",
+    backgroundColor: "#911F1B",
     borderRadius: 100,
     paddingVertical: 16,
     alignItems: "center",
   },
   signUpButtonText: {
+    color: "#fff",
+    fontFamily: "PoppinsBold",
+    fontSize: 16,
+  },
+  // MODAL
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 24,
+    width: "80%",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "PoppinsBold",
+    marginBottom: 12,
+    color: "#000",
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+    fontFamily: "PoppinsRegular",
+  },
+  modalButton: {
+    backgroundColor: "#911F1B",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  modalButtonText: {
     color: "#fff",
     fontFamily: "PoppinsBold",
     fontSize: 16,

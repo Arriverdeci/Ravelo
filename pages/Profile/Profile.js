@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,99 +6,234 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Animated,
+  Modal,
+  Vibration,
 } from "react-native";
 import { Ionicons, MaterialIcons, Entypo } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { API_BASE_URL } from "../../api";
 
-export default function Profile({ navigation }) {
-  const profileName = "Sahar Romansa";
-  const email = "saharromansa@gmail.com";
+function Profile({ navigation }) {
+  const [user, setUser] = useState(null);
+  const [fadeAnim] = useState(new Animated.Value(1));
+  const [slideAnim] = useState(new Animated.Value(0));
+  const [modalAnim] = useState(new Animated.Value(0));
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const username = await AsyncStorage.getItem("username");
+        if (username) {
+          const res = await axios.get(`${API_BASE_URL}/api/users/${username}/profile`);
+          setUser(res.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleNavigateToDetail = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: -30,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      navigation.navigate("DetailProfile");
+      fadeAnim.setValue(1);
+      slideAnim.setValue(0);
+    });
+  };
+
+  const showLogoutAlert = () => {
+    setShowLogoutModal(true);
+    Vibration.vibrate(30);
+    Animated.spring(modalAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      tension: 100,
+      friction: 8,
+    }).start();
+  };
+
+  const hideLogoutAlert = () => {
+    Animated.timing(modalAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      setShowLogoutModal(false);
+    });
+  };
+
+  const handleLogoutConfirm = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: -30,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(async () => {
+      try {
+        await AsyncStorage.clear();
+      } catch (err) {
+        console.error("Gagal hapus AsyncStorage:", err);
+      }
+      hideLogoutAlert();
+      navigation.replace("SignIn");
+    });
+  };
 
   const settings = [
-    { label: "Address List", icon: "location-on" },
-    { label: "Setting", icon: "settings" },
     { label: "Help Center", icon: "help-outline" },
     { label: "About Us", icon: "info-outline" },
-    { label: "Rating", icon: "favorite-border" },
     { label: "Log Out", icon: "logout", color: "#E6020B" },
   ];
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
-      <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profile</Text>
-      </View>
-      {/* Profile Card */}
-      <TouchableOpacity
-        style={styles.profileCard}
-        onPress={() => navigation.navigate("DetailProfile")}
+    <>
+      <Animated.ScrollView
+        style={[
+          styles.container,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
       >
-        <Image
-          source={require("../../assets/profile.png")}
-          style={styles.avatar}
-        />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.name}>{profileName}</Text>
-          <Text style={styles.email}>{email}</Text>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#000" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Profile</Text>
         </View>
-        <Entypo
-          name="chevron-right"
-          size={24}
-          color="white"
-          style={{ marginLeft: "auto" }}
-        />
-      </TouchableOpacity>
 
-      {/* Settings Title */}
-      <Text style={styles.settingsTitle}>Settings</Text>
+        <TouchableOpacity style={styles.profileCard} onPress={handleNavigateToDetail}>
+          <Image
+            source={require("../../assets/profile.png")}
+            style={styles.avatar}
+          />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.name}>{user?.fullName ?? ""}</Text>
+            <Text style={styles.email}>{user?.email ?? ""}</Text>
+          </View>
+          <Entypo name="chevron-right" size={24} color="white" style={{ marginLeft: "auto" }} />
+        </TouchableOpacity>
 
-      {/* Settings List */}
-      <View style={styles.menuList}>
-        {settings.map((item, index) => (
-          <TouchableOpacity
-            key={index}
+        <Text style={styles.settingsTitle}>Settings</Text>
+
+        <View style={styles.menuList}>
+          {settings.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.menuItem,
+                item.label === "Log Out" && {
+                  borderTopWidth: 1,
+                  borderColor: "#ddd",
+                },
+              ]}
+              onPress={() => {
+                if (item.label === "Log Out") {
+                  showLogoutAlert();
+                } else if (item.label === "Help Center") {
+                  navigation.navigate("HelpCenter");
+                } else if (item.label === "About Us") {
+                  navigation.navigate("AboutUs"); 
+                }
+              }}
+            >
+              <MaterialIcons
+                name={item.icon}
+                size={24}
+                color={item.color || "#391713"}
+                style={styles.menuIcon}
+              />
+              <Text
+                style={[
+                  styles.menuText,
+                  item.label === "Log Out" && { color: "#E6020B" },
+                ]}
+              >
+                {item.label}
+              </Text>
+              <Entypo name="chevron-right" size={20} color="#999" style={{ marginLeft: "auto" }} />
+            </TouchableOpacity>
+          ))}
+        </View>
+      </Animated.ScrollView>
+
+      {/* Modal Logout */}
+      <Modal
+        visible={showLogoutModal}
+        transparent={true}
+        animationType="none"
+        onRequestClose={hideLogoutAlert}
+      >
+        <View style={styles.modalOverlay}>
+          <Animated.View
             style={[
-              styles.menuItem,
-              item.label === "Log Out" && {
-                borderTopWidth: 1,
-                borderColor: "#ddd",
+              styles.modalContainer,
+              {
+                transform: [
+                  { scale: modalAnim },
+                  {
+                    translateY: modalAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [50, 0],
+                    }),
+                  },
+                ],
+                opacity: modalAnim,
               },
             ]}
-            onPress={() => {
-              if (item.label === "Log Out") {
-                navigation.navigate("SignIn");
-              } else {
-                console.log(`${item.label} clicked`);
-              }
-            }}
           >
-            <MaterialIcons
-              name={item.icon}
-              size={24}
-              color={item.color || "#391713"}
-              style={styles.menuIcon}
-            />
-            <Text
-              style={[
-                styles.menuText,
-                item.label === "Log Out" && { color: "#E6020B" },
-              ]}
-            >
-              {item.label}
-            </Text>
-            <Entypo
-              name="chevron-right"
-              size={20}
-              color="#999"
-              style={{ marginLeft: "auto" }}
-            />
-          </TouchableOpacity>
-        ))}
-      </View>
-    </ScrollView>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Keluar Akun</Text>
+              <Text style={styles.modalMessage}>
+                Apakah Anda yakin ingin keluar dari akun?
+              </Text>
+
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={hideLogoutAlert}
+                >
+                  <Text style={[styles.modalButtonText, styles.cancelButtonText]}>
+                    Batal
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.confirmButton]}
+                  onPress={handleLogoutConfirm}
+                >
+                  <Text style={[styles.modalButtonText, styles.confirmButtonText]}>
+                    Iya
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Animated.View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -169,4 +304,61 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#391713",
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 24,
+    width: "80%",
+    maxWidth: 400,
+  },
+  modalContent: {
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 12,
+    color: "#000",
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButtonContainer: {
+    flexDirection: "row",
+    gap: 12,
+    width: "100%",
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  cancelButton: {
+    backgroundColor: "#ccc",
+  },
+  confirmButton: {
+    backgroundColor: "#911F1B",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  cancelButtonText: {
+    color: "#333",
+  },
+  confirmButtonText: {
+    color: "#fff",
+  },
 });
+
+export default Profile;

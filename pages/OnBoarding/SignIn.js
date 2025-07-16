@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,14 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
-  Alert,
   ScrollView,
+  Modal,
+  Animated,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { API_BASE_URL } from '../../api';
+import { API_BASE_URL } from "../../api";
+import { AuthContext } from "../context/AuthContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,14 +23,46 @@ const SignIn = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const { setUsername: setContextUsername } = useContext(AuthContext);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalAnim] = useState(new Animated.Value(0));
+
+  const showModal = (title, message, callback = null) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalVisible(true);
+    Animated.spring(modalAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start(() => {
+      if (callback) {
+        setTimeout(() => {
+          callback();
+          hideModal();
+        }, 1500);
+      }
+    });
+  };
+
+  const hideModal = () => {
+    Animated.timing(modalAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => setModalVisible(false));
+  };
+
   const handleLogin = async () => {
     if (!username || !password || !confirmPassword) {
-      Alert.alert("Error", "All fields are required.");
+      showModal("Error", "All fields are required.");
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Password and Confirm Password do not match.");
+      showModal("Error", "Password and Confirm Password do not match.");
       return;
     }
 
@@ -40,12 +74,14 @@ const SignIn = ({ navigation }) => {
       });
 
       await AsyncStorage.setItem("username", username);
+      setContextUsername(username);
 
-      navigation.navigate("NSignIn");
+      showModal("Success", "Login berhasil!", () => {
+        navigation.replace("NSignIn");
+      });
     } catch (error) {
-      console.log("Login Error:", error);
       const msg = error?.response?.data || "Login failed. Please try again.";
-      Alert.alert("Error", msg);
+      showModal("Error", msg);
     }
   };
 
@@ -57,8 +93,7 @@ const SignIn = ({ navigation }) => {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>
-            We’re so excited to see you again!</Text>
+        <Text style={styles.title}>We’re so excited to see you again!</Text>
       </View>
 
       <View style={styles.content}>
@@ -108,6 +143,37 @@ const SignIn = ({ navigation }) => {
           <Text style={styles.loginText}>Don't have an account? Sign Up</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Modal */}
+      <Modal visible={modalVisible} transparent animationType="none">
+        <View style={styles.modalOverlay}>
+          <Animated.View
+            style={[
+              styles.modalContainer,
+              {
+                transform: [
+                  { scale: modalAnim },
+                  {
+                    translateY: modalAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [50, 0],
+                    }),
+                  },
+                ],
+                opacity: modalAnim,
+              },
+            ]}
+          >
+            <Text style={styles.modalTitle}>{modalTitle}</Text>
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            {!modalTitle.includes("Success") && (
+              <TouchableOpacity style={styles.modalButton} onPress={hideModal}>
+                <Text style={styles.modalButtonText}>OK</Text>
+              </TouchableOpacity>
+            )}
+          </Animated.View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -132,14 +198,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     color: "#FFFFFF",
-    textAlign: "center",        
+    textAlign: "center",
     fontFamily: "PoppinsRegular",
-    marginTop: 6,              
+    marginTop: 6,
     marginBottom: 12,
-    paddingHorizontal: 10,      
+    paddingHorizontal: 10,
     lineHeight: 22,
-    alignSelf: "center",        
-    maxWidth: "80%",            
+    alignSelf: "center",
+    maxWidth: "80%",
   },
   content: {
     backgroundColor: "#fff",
@@ -149,7 +215,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    color: "#E6020B",
+    color: "#911F1B",
     fontFamily: "PoppinsBold",
     marginBottom: 24,
     textAlign: "center",
@@ -179,7 +245,7 @@ const styles = StyleSheet.create({
     fontFamily: "PoppinsMedium",
   },
   signInButton: {
-    backgroundColor: "#E6020B",
+    backgroundColor: "#911F1B",
     borderRadius: 100,
     paddingVertical: 16,
     alignItems: "center",
@@ -194,9 +260,47 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   loginText: {
-    color: "#E6020B",
+    color: "#911F1B",
     fontFamily: "PoppinsMedium",
     fontSize: 14,
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 24,
+    width: "80%",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "PoppinsBold",
+    marginBottom: 12,
+    color: "#000",
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+    fontFamily: "PoppinsRegular",
+  },
+  modalButton: {
+    backgroundColor: "#911F1B",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontFamily: "PoppinsBold",
+    fontSize: 16,
   },
 });
 

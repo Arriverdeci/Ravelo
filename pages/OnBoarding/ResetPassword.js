@@ -5,10 +5,11 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Image,
   ScrollView,
   Dimensions,
+  Modal,
+  Animated,
 } from "react-native";
 import axios from "axios";
 import { API_BASE_URL } from "../../api";
@@ -20,14 +21,46 @@ const ResetPassword = ({ route, navigation }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalAnim] = useState(new Animated.Value(0));
+
+  const showModal = (title, message, callback) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalVisible(true);
+    Animated.spring(modalAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start(() => {
+      if (callback) {
+        setTimeout(() => {
+          callback();
+          hideModal();
+        }, 2000);
+      }
+    });
+  };
+
+  const hideModal = () => {
+    Animated.timing(modalAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      setModalVisible(false);
+    });
+  };
+
   const handleResetPassword = async () => {
     if (!newPassword || !confirmPassword) {
-      Alert.alert("Error", "All fields are required");
+      showModal("Error", "All fields are required");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
+      showModal("Error", "Passwords do not match");
       return;
     }
 
@@ -37,10 +70,9 @@ const ResetPassword = ({ route, navigation }) => {
         newPassword,
       });
 
-      Alert.alert("Success", "Password updated successfully!");
       navigation.navigate("SuccessPage");
     } catch (error) {
-      Alert.alert(
+      showModal(
         "Error",
         error?.response?.data?.message || "Failed to reset password"
       );
@@ -57,7 +89,8 @@ const ResetPassword = ({ route, navigation }) => {
         />
         <Text style={styles.title}>Reset Your Password</Text>
         <Text style={styles.subtitle}>
-          Set a new password for your account so you can login and continue your journey.
+          Set a new password for your account so you can login and continue
+          your journey.
         </Text>
       </View>
 
@@ -85,6 +118,37 @@ const ResetPassword = ({ route, navigation }) => {
           <Text style={styles.buttonText}>Update Password</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Custom Modal */}
+      <Modal visible={modalVisible} transparent animationType="none">
+        <View style={styles.modalOverlay}>
+          <Animated.View
+            style={[
+              styles.modalContainer,
+              {
+                transform: [
+                  { scale: modalAnim },
+                  {
+                    translateY: modalAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [50, 0],
+                    }),
+                  },
+                ],
+                opacity: modalAnim,
+              },
+            ]}
+          >
+            <Text style={styles.modalTitle}>{modalTitle}</Text>
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            {!modalTitle.includes("Success") && (
+              <TouchableOpacity style={styles.modalButton} onPress={hideModal}>
+                <Text style={styles.modalButtonText}>OK</Text>
+              </TouchableOpacity>
+            )}
+          </Animated.View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -147,12 +211,55 @@ const styles = StyleSheet.create({
     color: "#391713",
   },
   button: {
-    backgroundColor: "#E6020B",
+    backgroundColor: "#911F1B",
     borderRadius: 100,
     paddingVertical: 16,
     alignItems: "center",
   },
   buttonText: {
+    color: "#fff",
+    fontFamily: "PoppinsBold",
+    fontSize: 16,
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 24,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "PoppinsBold",
+    marginBottom: 12,
+    color: "#000",
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+    fontFamily: "PoppinsRegular",
+  },
+  modalButton: {
+    backgroundColor: "#911F1B",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  modalButtonText: {
     color: "#fff",
     fontFamily: "PoppinsBold",
     fontSize: 16,

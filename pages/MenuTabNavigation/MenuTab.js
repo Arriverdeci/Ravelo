@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import { NotificationContext } from '../context/NotificationContext';
 
+// Import screen components
 import HomePage from '../Home/HomePage';
+import HiddenGems from '../Home/HiddenGems';
+import TasteBuds from '../Home/TasteBuds';
+import DetailHiddenGems from '../Home/DetailHiddenGems';
+
 import Culinary from '../Culinary/Culinary';
 import AddCulinary from '../Culinary/AddCulinary';
 import DetailCulinary from '../Culinary/DetailCulinary';
+
+import AddRestoran from '../Restoran/Add';
+import PickLocation from '../LocationMaps/PickLocation';
+
 import Community from '../Community/Community';
+
 import Profile from '../Profile/Profile';
 import DetailProfile from '../Profile/DetailProfile';
 import HiddenGems from '../Home/HiddenGems';
@@ -20,7 +31,7 @@ import CreatePost from '../Community/CreatePost';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// Stack Navigator untuk Home tab (termasuk HiddenGems)
+// --- Home Stack ---
 function HomeStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -32,7 +43,7 @@ function HomeStack() {
   );
 }
 
-// Stack Navigator untuk Culinary tab (jika ada sub-pages)
+// --- Culinary Stack ---
 function CulinaryStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -46,7 +57,7 @@ function CulinaryStack() {
   );
 }
 
-// Stack Navigator untuk Community tab (jika ada sub-pages)
+// --- Community Stack ---
 function CommunityStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -56,23 +67,25 @@ function CommunityStack() {
   );
 }
 
-// Stack Navigator untuk Profile tab (jika ada sub-pages)
+// --- Profile Stack ---
 function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ProfileMain" component={Profile} />
       <Stack.Screen name="DetailProfile" component={DetailProfile} />
-      {/* Tambahkan screen lain untuk Profile jika diperlukan */}
     </Stack.Navigator>
   );
 }
 
+// --- Main Tab Navigation ---
 export default function MenuTab() {
+  const { chatCount, reviewCount, accountNotification } = useContext(NotificationContext);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
-
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Culinary') {
@@ -82,7 +95,6 @@ export default function MenuTab() {
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           }
-
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#911F1B',
@@ -91,9 +103,27 @@ export default function MenuTab() {
       })}
     >
       <Tab.Screen name="Home" component={HomeStack} />
-      <Tab.Screen name="Culinary" component={CulinaryStack} />
-      <Tab.Screen name="Community" component={CommunityStack} />
-      <Tab.Screen name="Profile" component={ProfileStack} />
+      <Tab.Screen
+        name="Culinary"
+        component={CulinaryStack}
+        options={{
+          tabBarBadge: reviewCount > 0 ? reviewCount : null,
+        }}
+      />
+      <Tab.Screen
+        name="Community"
+        component={CommunityStack}
+        options={{
+          tabBarBadge: chatCount > 0 ? chatCount : null,
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStack}
+        options={{
+          tabBarBadge: accountNotification ? '!' : null,
+        }}
+      />
     </Tab.Navigator>
   );
 }
