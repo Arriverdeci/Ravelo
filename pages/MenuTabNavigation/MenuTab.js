@@ -93,7 +93,7 @@ export default function MenuTab() {
       <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Culinary" component={CulinaryStack} />
       <Tab.Screen name="Community" component={CommunityStack} />
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 }
