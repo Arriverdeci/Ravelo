@@ -152,8 +152,10 @@ function Profile({ navigation }) {
               onPress={() => {
                 if (item.label === "Log Out") {
                   showLogoutAlert();
-                } else {
-                  console.log(`${item.label} clicked`);
+                } else if (item.label === "Help Center") {
+                  navigation.navigate("HelpCenter");
+                } else if (item.label === "About Us") {
+                  navigation.navigate("AboutUs"); 
                 }
               }}
             >

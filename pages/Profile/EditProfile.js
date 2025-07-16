@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   },
   confirmButton: {
-    backgroundColor: '#FF0000',
+    backgroundColor: '#911F1B',
   },
   modalButtonText: {
     fontSize: 16,

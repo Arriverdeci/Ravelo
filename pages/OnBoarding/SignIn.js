@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    color: "#E6020B",
+    color: "#911F1B",
     fontFamily: "PoppinsBold",
     marginBottom: 24,
     textAlign: "center",
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     fontFamily: "PoppinsMedium",
   },
   signInButton: {
-    backgroundColor: "#E6020B",
+    backgroundColor: "#911F1B",
     borderRadius: 100,
     paddingVertical: 16,
     alignItems: "center",
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   loginText: {
-    color: "#E6020B",
+    color: "#911F1B",
     fontFamily: "PoppinsMedium",
     fontSize: 14,
   },

@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   button: {
-    backgroundColor: "#E6020B",
+    backgroundColor: "#911F1B",
     borderRadius: 100,
     paddingVertical: 16,
     alignItems: "center",

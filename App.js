@@ -24,6 +24,8 @@ import ResetPassword from './pages/OnBoarding/ResetPassword';
 import SuccessPage from './pages/OnBoarding/SuccessPage';
 import NotificationProvider from './pages/context/NotificationContext';
 import NotificationScreen from './pages/Home/NotificationScreen';
+import HelpCenterScreen from './pages/Profile/HelpCenterScreen';
+import AboutUsScreen from './pages/Profile/AboutUsScreen';
 import { AuthProvider } from './pages/context/AuthContext';
 
 Splash.preventAutoHideAsync();
@@ -95,6 +97,8 @@ export default function App() {
             <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="DetailProfile" component={DetailProfile} />
             <Stack.Screen name="PickLocation" component={PickLocation} />
+            <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
+            <Stack.Screen name="AboutUs" component={AboutUsScreen}/>
             <Stack.Screen name="Notification" component={NotificationScreen} />
           </Stack.Navigator>
         </NavigationContainer>
