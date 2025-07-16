@@ -21,6 +21,12 @@ import Community from '../Community/Community';
 
 import Profile from '../Profile/Profile';
 import DetailProfile from '../Profile/DetailProfile';
+import HiddenGems from '../Home/HiddenGems';
+import DetailHiddenGems from '../Home/DetailHiddenGems';
+import MyFavorites from '../Culinary/MyFavorites';
+import PickLocation from '../LocationMaps/PickLocation';
+import TasteBuds from '../Home/TasteBuds';
+import CreatePost from '../Community/CreatePost';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -42,10 +48,11 @@ function CulinaryStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Culinary" component={Culinary} />
-      <Stack.Screen name="AddCulinary" component={AddCulinary} />
-      <Stack.Screen name="DetailCulinary" component={DetailCulinary} />
-      <Stack.Screen name="AddRestoran" component={AddRestoran} />
-      <Stack.Screen name="PickLocation" component={PickLocation} />
+      <Stack.Screen name='AddCulinary' component={AddCulinary}/>
+      <Stack.Screen name='DetailCulinary' component={DetailCulinary}/>
+      <Stack.Screen name='PickLocation' component={PickLocation}/>
+      <Stack.Screen name="TasteBuds" component={TasteBuds} />
+      <Stack.Screen name="MyFavorites" component={MyFavorites} />
     </Stack.Navigator>
   );
 }
@@ -55,6 +62,7 @@ function CommunityStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="CommunityTab" component={Community} />
+      <Stack.Screen name="CreatePost" component={CreatePost} />
     </Stack.Navigator>
   );
 }

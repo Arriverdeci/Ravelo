@@ -94,7 +94,7 @@ const TasteBuds = ({ navigation }) => {
     <TouchableOpacity
       style={{ flex: 1, margin: 6 }}
       onPress={() =>
-        navigation.navigate('DetailHiddenGems', { restoranId: item.restoranId })
+        navigation.navigate('DetailCulinary', { kuliner: item })
       }
     >
       <TasteCard
@@ -109,6 +109,17 @@ const TasteBuds = ({ navigation }) => {
       />
     </TouchableOpacity>
   );
+
+  const filterKulinerBySearch = () => {
+    if (!search.trim()) return kulinerList;
+    const keyword = search.toLowerCase();
+    return kulinerList.filter(item => 
+      item.namaMakanan?.toLowerCase().includes(keyword) ||
+      item.jenisMakanan?.toLowerCase().includes(keyword)
+    );
+  };
+
+  const filteredKuliner = filterKulinerBySearch().filter(item => (item.totalRating || 0) >= 4);
 
   return (
     <View style={styles.container}>
@@ -127,7 +138,7 @@ const TasteBuds = ({ navigation }) => {
           </View>
         ) : (
           <FlatList
-            data={filteredList}
+            data={filteredKuliner}
             renderItem={renderTasteCard}
             keyExtractor={(item, index) => item.kulinerId?.toString() || index.toString()}
             numColumns={2}
@@ -135,7 +146,6 @@ const TasteBuds = ({ navigation }) => {
             showsVerticalScrollIndicator={false}
           />
         )}
-
             {showLangModal && (
               <View style={styles.modalOverlay}>
                 <View style={styles.modalBox}>

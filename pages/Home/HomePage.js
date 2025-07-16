@@ -12,7 +12,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  FlatList
+  FlatList,
+  SafeAreaView
 } from "react-native";
 import i18n from '../i18n';
 
@@ -451,7 +452,7 @@ const HomePage = () => {
   );
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#911F1B",

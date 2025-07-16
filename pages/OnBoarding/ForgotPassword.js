@@ -12,6 +12,7 @@ import {
   Animated,
 } from "react-native";
 import axios from "axios";
+import { API_BASE_URL } from "../../api";
 
 const { width, height } = Dimensions.get("window");
 
@@ -49,9 +50,7 @@ const ForgotPassword = ({ navigation }) => {
     }
 
     try {
-      const res = await axios.post("http://10.94.66.133:8080/api/otp/generate", {
-        username,
-      });
+      const res = await axios.post(`${API_BASE_URL}/api/otp/generate`, { username });
       const { otp } = res.data;
 
       showModal("OTP Sent", `Your OTP is: ${otp}`);

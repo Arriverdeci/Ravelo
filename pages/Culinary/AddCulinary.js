@@ -9,12 +9,15 @@ import {
   StyleSheet,
   Pressable,
   Alert,
+  SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute} from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { API_BASE_URL } from '../../api';
+import i18n from '../i18n';
+
 
 const AddCulinary = () => {
   const navigation = useNavigation();
@@ -189,7 +192,6 @@ const AddCulinary = () => {
       screen: "DetailHiddenGems",
       params: {restoranId: restoranId}
     });
-
   };
 
   const renderSaveQueue = () => {
@@ -214,6 +216,7 @@ const AddCulinary = () => {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       {/* Header */}
       <View style={styles.header}>
@@ -283,6 +286,7 @@ const AddCulinary = () => {
 
       <View style={{ height: 50 }} />
     </ScrollView>
+    </SafeAreaView>
   );
 };
 

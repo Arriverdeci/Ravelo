@@ -13,7 +13,11 @@ import {
   FlatList,
   Modal,
   TextInput,
-  Alert
+  Alert,
+  KeyboardAvoidingView, 
+  Platform, 
+  TouchableWithoutFeedback, 
+  Keyboard 
 } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
@@ -328,6 +332,7 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
       </View>
 
       <Modal visible={!!selectedImage} transparent animationType="slide" onRequestClose={() => setSelectedImage(null)}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Image source={{ uri: `${API_BASE_URL}${selectedImage?.fotoMakanan}` }} style={styles.modalImage} resizeMode="cover" />
@@ -378,6 +383,7 @@ const MenuTab = ({ restoranId, onReviewSubmitted  }) => {
             </View>
           </View>
         </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </>
   );
@@ -430,7 +436,7 @@ const RatingsTab = ({ restoranId, refreshReviewFlag  }) => {
             {/* Header User Info */}
             <View style={styles.reviewUserRow}>
               <Image
-                source={require('../../assets/OnBoarding/onboarding1.png')}
+                source={require('../../assets/OnBoarding/onboarding1.png')} // ganti pake user profile
                 style={styles.reviewUserImage}
               />
               <View>
@@ -590,37 +596,37 @@ const DetailHiddenGems = () => {
           )}
         />
       </View>
-      
-                  {showLangModal && (
-                    <View style={styles.modalOverlay}>
-                      <View style={styles.modalBox}>
-                        <Text style={styles.modalTitle}>{i18n.t('chooseLanguage')}</Text>
-                        <TouchableOpacity
-                          style={styles.langOption}
-                          onPress={() => {
-                            i18n.locale = 'id';
-                            setLocale('id');
-                            setShowLangModal(false);
-                          }}
-                        >
-                          <Text style={styles.langText}>🇮🇩 {i18n.t('bahasaIndo')}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.langOption}
-                          onPress={() => {
-                            i18n.locale = 'en';
-                            setLocale('en');
-                            setShowLangModal(false);
-                          }}
-                        >
-                          <Text style={styles.langText}>🇺🇸 {i18n.t('bahasaEng')}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setShowLangModal(false)}>
-                          <Text style={styles.cancelText}>❌ {i18n.t('cancelLang')}</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  )}
+
+      {showLangModal && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>{i18n.t('chooseLanguage')}</Text>
+            <TouchableOpacity
+              style={styles.langOption}
+              onPress={() => {
+                i18n.locale = 'id';
+                setLocale('id');
+                setShowLangModal(false);
+              }}
+            >
+              <Text style={styles.langText}>🇮🇩 {i18n.t('bahasaIndo')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.langOption}
+              onPress={() => {
+                i18n.locale = 'en';
+                setLocale('en');
+                setShowLangModal(false);
+              }}
+            >
+              <Text style={styles.langText}>🇺🇸 {i18n.t('bahasaEng')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowLangModal(false)}>
+              <Text style={styles.cancelText}>❌ {i18n.t('cancelLang')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 };

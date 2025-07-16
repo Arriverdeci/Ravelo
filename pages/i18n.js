@@ -6,6 +6,7 @@ const id = {
   searchPlaceholder: "Cari Makanan/Restoran",
   hiddenGems: "Rekomendasi Tersembunyi",
   viewAll: "Lihat Semua",
+  myFav: "Favorit saya",
   forYou: "Untuk Selera Anda",
   back: "← Kembali",
   retryText: "Coba lagi",
@@ -40,6 +41,27 @@ const id = {
   uploadingReview: "Mengunggah ulasan...",
   reviewFailed: "gagal - Ketuk untuk ulang",
   wantAddMenu: "Ingin menambahkan menu baru?",
+
+  // culinary
+  culinaryTitle : "Kuliner",
+  searchPlaceholderCulinary: "Cari kuliner",
+
+  // community
+  communityTitle: "Komunitas",
+  postTitle: "Postingan",
+  postPlaceHolder: "Tuliskan sesuatu",
+  buttonSend: "Kirim",
+  buttonCancel: "Batal",
+  buttonCamera: "Kamera",
+  buttonGallery: "Galeri",
+  chooseImage: "Pilih Gambar",
+  chooseImageQuestion: "ambil gambar dari mana?",
+  justNow: "Baru saja",
+  seconds: "detik yang lalu",
+  minutes: "menit yang lalu",
+  hours: "jam yang lalu",
+  days: "hari yang lalu",
+  emptyAlert: "Isi postingan atau pilih gambar dulu",
 
   // add kuliner
   addMenuTitle: "Menu Baru",
@@ -109,6 +131,7 @@ const en = {
   searchPlaceholder: "Search Food/Restaurant",
   hiddenGems: "Hidden Gems",
   viewAll: "View All",
+  myFav: "My Favorites",
   forYou: "For Your Taste Buds",
   back: "← Back",
   retryText: "Try again",
@@ -143,6 +166,28 @@ const en = {
   uploadingReview: "Uploading review...",
   reviewFailed: "failed - Tap to retry",
   wantAddMenu: "Wanna add new menu?",
+
+  // culinary
+  culinaryTitle: "Culinary",
+  searchPlaceholderCulinary: "Search culinary",
+
+  // community
+  communityTitle: "Community",
+  postTitle: "Post",
+  postPlaceHolder: "Write something",
+  buttonSend: "Send",
+  buttonCancel: "Cancel",
+  buttonCamera: "Camera",
+  buttonGallery: "Gallery",
+  chooseImage: "Choose Image",
+  chooseImageQuestion: "choose image from?",
+  justNow: "Just now",
+  seconds: "seconds ago",
+  minutes: "minutes ago",
+  hours: "hours ago",
+  days: "days ago",
+  emptyAlert: "Fill in the post or choose a picture first",
+  
 
   // add kuliner
   addMenuTitle: "New Menu",
