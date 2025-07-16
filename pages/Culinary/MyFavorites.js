@@ -15,6 +15,7 @@ const MyFavorites = ({ navigation }) => {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
+  const [showLangModal, setShowLangModal] = useState(false);
 
   useEffect(() => {
     if (isFocused) {
@@ -76,8 +77,9 @@ const MyFavorites = ({ navigation }) => {
         searchValue={search}
         onChangeSearch={handleSearch}
         onPressProfile={() => navigation.navigate('Profile')}
+        onPressLanguage={() => setShowLangModal(true)}
       />
-      <View style={{ flex: 1, backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingTop: 12 }}>
+      <View style={styles.scrollWrapper}>
         {loading ? (
           <ActivityIndicator size="large" color="#911F1B" style={{ marginTop: 40 }} />
         ) : (
@@ -88,8 +90,38 @@ const MyFavorites = ({ navigation }) => {
             numColumns={2}
             columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 8 }}
             contentContainerStyle={{ paddingBottom: 20 }}
-            ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20, color: '#999' }}>{i18n.t('notFound')}</Text>}
           />
+        )}
+
+        {showLangModal && (
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>{i18n.t('chooseLanguage')}</Text>
+              <TouchableOpacity
+                style={styles.langOption}
+                onPress={() => {
+                  i18n.locale = 'id';
+                  setLocale('id');
+                  setShowLangModal(false);
+                }}
+              >
+                <Text style={styles.langText}>🇮🇩 {i18n.t('bahasaIndo')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.langOption}
+                onPress={() => {
+                  i18n.locale = 'en';
+                  setLocale('en');
+                  setShowLangModal(false);
+                }}
+              >
+                <Text style={styles.langText}>🇺🇸 {i18n.t('bahasaEng')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setShowLangModal(false)}>
+                <Text style={styles.cancelText}>❌ {i18n.t('cancelLang')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
       </View>
     </View>
@@ -102,7 +134,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 16,
+  },
+  scrollWrapper: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 12,
+    paddingHorizontal: 8,
   },
   headerTitle: {
     fontSize: 22,
