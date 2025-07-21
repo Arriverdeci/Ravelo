@@ -15,17 +15,13 @@ import AddCulinary from '../Culinary/AddCulinary';
 import DetailCulinary from '../Culinary/DetailCulinary';
 
 import AddRestoran from '../Restoran/Add';
-import PickLocation from '../LocationMaps/PickLocation';
 
 import Community from '../Community/Community';
 
 import Profile from '../Profile/Profile';
 import DetailProfile from '../Profile/DetailProfile';
-import HiddenGems from '../Home/HiddenGems';
-import DetailHiddenGems from '../Home/DetailHiddenGems';
 import MyFavorites from '../Culinary/MyFavorites';
 import PickLocation from '../LocationMaps/PickLocation';
-import TasteBuds from '../Home/TasteBuds';
 import CreatePost from '../Community/CreatePost';
 
 const Tab = createBottomTabNavigator();
