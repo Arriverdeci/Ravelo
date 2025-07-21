@@ -94,7 +94,10 @@ const TasteBuds = ({ navigation }) => {
     <TouchableOpacity
       style={{ flex: 1, margin: 6 }}
       onPress={() =>
-        navigation.navigate('DetailCulinary', { kuliner: item })
+        navigation.navigate("Culinary", {
+          screen: "DetailCulinary",
+          params: { kuliner: item },
+        })
       }
     >
       <TasteCard
